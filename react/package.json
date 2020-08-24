@@ -1,0 +1,29 @@
+{
+  "scripts": {
+    "test": "vtex-test-tools test"
+  },
+  "dependencies": {
+    "apollo-cache": "^1.3.5",
+    "apollo-client": "^2.6.10",
+    "apollo-link": "^1.2.14",
+    "apollo-utilities": "^1.3.4",
+    "country-iso-2-to-3": "^1.1.0",
+    "ramda": "^0.27.1",
+    "react": "^16.8.3",
+    "react-apollo": "^3.1.5",
+    "react-dom": "^16.8.3",
+    "typescript": "3.8.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.7",
+    "@types/ramda": "^0.27.14",
+    "@types/react": "^16.8.10",
+    "@types/react-intl": "^2.3.17",
+    "@vtex/test-tools": "^0.2.0",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.112.0/public/@types/vtex.render-runtime",
+    "vtex.store-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.127.0/public/@types/vtex.store-graphql",
+    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.127.0/public/@types/vtex.styleguide"
+  },
+  "version": "0.0.1"
+}

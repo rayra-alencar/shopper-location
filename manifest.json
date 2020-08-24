@@ -1,0 +1,17 @@
+{
+  "name": "shopper-location",
+  "vendor": "vtex",
+  "version": "0.0.1",
+  "title": "Shopper Location",
+  "description": "Determine location of shopper and store in the orderForm",
+  "builders": {
+    "react": "3.x",
+    "store": "0.x",
+    "docs": "0.x"
+  },
+  "dependencies": {
+    "vtex.store-graphql": "2.x",
+    "vtex.styleguide": "9.x"
+  },
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

@@ -12,6 +12,7 @@
     "react": "^16.8.3",
     "react-apollo": "^3.1.5",
     "react-dom": "^16.8.3",
+    "react-intl": "^5.8.0",
     "typescript": "3.8.3"
   },
   "devDependencies": {
@@ -19,11 +20,15 @@
     "@types/node": "^12.12.7",
     "@types/ramda": "^0.27.14",
     "@types/react": "^16.8.10",
-    "@types/react-intl": "^2.3.17",
+    "@types/react-intl": "^3.0.0",
     "@vtex/test-tools": "^0.2.0",
+    "vtex.address-form": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.address-form@4.6.3/public/_types/react",
+    "vtex.apps-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.apps-graphql@2.5.1/public/@types/vtex.apps-graphql",
+    "vtex.css-handles": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles",
+    "vtex.modal": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal@0.2.2/public/@types/vtex.modal",
     "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.112.0/public/@types/vtex.render-runtime",
-    "vtex.store-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.127.0/public/@types/vtex.store-graphql",
-    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.127.0/public/@types/vtex.styleguide"
+    "vtex.store-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.130.0/public/@types/vtex.store-graphql",
+    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.128.1/public/@types/vtex.styleguide"
   },
   "version": "0.0.1"
 }

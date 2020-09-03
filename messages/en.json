@@ -1,0 +1,6 @@
+{
+  "store/shopper-location.change-location.title": "Change Location",
+  "store/shopper-location.change-location.addressNotApplicable": "Not applicable",
+  "store/shopper-location.change-location.trigger-geolocation": "Find my location",
+  "store/shopper-location.change-location.submit": "SAVE"
+}

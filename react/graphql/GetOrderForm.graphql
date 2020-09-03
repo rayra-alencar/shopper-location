@@ -7,7 +7,6 @@ query address @context(provider: "vtex.store-graphql") {
     orderFormId
     shippingData {
       address {
-        id
         neighborhood
         complement
         number
@@ -15,7 +14,6 @@ query address @context(provider: "vtex.store-graphql") {
         postalCode
         city
         reference
-        addressName
         addressType
         geoCoordinates
         state

@@ -3,15 +3,31 @@
   "vendor": "vtex",
   "version": "0.0.1",
   "title": "Shopper Location",
-  "description": "Determine location of shopper and store in the orderForm",
+  "description": "Determine location of shopper and store it in the orderForm",
   "builders": {
     "react": "3.x",
     "store": "0.x",
+    "messages": "1.x",
     "docs": "0.x"
   },
   "dependencies": {
     "vtex.store-graphql": "2.x",
+    "vtex.apps-graphql": "2.x",
+    "vtex.modal": "0.x",
+    "vtex.address-form": "4.x",
+    "vtex.css-handles": "0.x",
     "vtex.styleguide": "9.x"
+  },
+  "settingsSchema": {
+    "title": "Shopper Location",
+    "type": "object",
+    "properties": {
+      "geolocationApiKey": {
+        "title": "IP Geolocation Service API Key",
+        "description": "Enter your API key for https://ip-geolocation.whoisxmlapi.com",
+        "type": "string"
+      }
+    }
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

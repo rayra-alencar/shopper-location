@@ -1,5 +1,9 @@
 {
   "shopper-location": {
-    "component": "index"
+    "component": "index",
+    "composition": "children"
+  },
+  "change-location": {
+    "component": "ChangeLocation"
   }
 }

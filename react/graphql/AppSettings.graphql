@@ -1,0 +1,6 @@
+query AppSettings($version: String) {
+  appSettings(app: "vtex.shopper-location", version: $version)
+    @context(provider: "vtex.apps-graphql") {
+    message
+  }
+}

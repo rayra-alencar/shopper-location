@@ -11,6 +11,7 @@ import {
 } from 'vtex.address-form'
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
+import MapContainer from './Map'
 import { getParsedAddress } from './helpers/getParsedAddress'
 import updateOrderFormShipping from './graphql/UpdateOrderFormShipping.graphql'
 import getGoogleMapsKey from './graphql/GetGoogleMapsKey.graphql'
@@ -147,8 +148,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       .catch(() => null)
       .then(() => {
         const event = new Event('locationUpdated')
-        const result = window.dispatchEvent(event)
-        console.log(result)
+        window.dispatchEvent(event)
         closeModal && closeModal()
       })
   }
@@ -161,63 +161,75 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   return (
-    <div className={handles.changeLocationContainer}>
+    <div className={`${handles.changeLocationContainer} w-100`}>
       <h2 className={`${handles.changeLocationTitle} heading-2`}>
         <FormattedMessage id="store/shopper-location.change-location.title" />
       </h2>
-      <section className={handles.changeLocationGeoContainer}>
-        <ButtonWithIcon
-          variation="primary"
-          icon={<IconLocation />}
-          onClick={() => handleGeolocation()}
-          class={handles.changeLocationGeolocationButton}
-        >
-          <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-        </ButtonWithIcon>
-      </section>
-      <section className={`${handles.changeLocationAddressContainer} mt7`}>
-        <AddressContainer
-          address={storedAddress}
-          Input={StyleguideInput}
-          rules={rules}
-          onChangeAddress={(newAddress: AddressFormFields) =>
-            handleAddressChange(newAddress)
-          }
-          autoCompletePostalCode={false}
-        >
-          <AddressFields
-            address={storedAddress}
-            Input={StyleguideInput}
-            omitAutoCompletedFields={false}
-            omitPostalCodeFields={true}
-            onChangeAddress={(newAddress: AddressFormFields) =>
-              handleAddressChange(newAddress)
-            }
-            notApplicableLabel={intl.formatMessage({
-              id: 'store/shopper-location.change-location.addressNotApplicable',
-            })}
+      <div className="flex flex-auto">
+        <div className="mr5">
+          <section className={handles.changeLocationGeoContainer}>
+            <ButtonWithIcon
+              variation="primary"
+              icon={<IconLocation />}
+              onClick={() => handleGeolocation()}
+              class={handles.changeLocationGeolocationButton}
+            >
+              <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
+            </ButtonWithIcon>
+          </section>
+          <section className={`${handles.changeLocationAddressContainer} mt7`}>
+            <AddressContainer
+              address={storedAddress}
+              Input={StyleguideInput}
+              rules={rules}
+              onChangeAddress={(newAddress: AddressFormFields) =>
+                handleAddressChange(newAddress)
+              }
+              autoCompletePostalCode={false}
+            >
+              <AddressFields
+                address={storedAddress}
+                Input={StyleguideInput}
+                omitAutoCompletedFields={false}
+                omitPostalCodeFields={true}
+                onChangeAddress={(newAddress: AddressFormFields) =>
+                  handleAddressChange(newAddress)
+                }
+                notApplicableLabel={intl.formatMessage({
+                  id:
+                    'store/shopper-location.change-location.addressNotApplicable',
+                })}
+              />
+              <PostalCodeGetter
+                address={storedAddress}
+                Input={StyleguideInput}
+                onChangeAddress={(newAddress: AddressFormFields) =>
+                  handleAddressChange(newAddress)
+                }
+              />
+            </AddressContainer>
+          </section>
+          <section className={`${handles.changeLocationSubmitContainer} mt7`}>
+            <Button
+              variation="primary"
+              disabled={
+                !storedAddress || !isValidAddress(storedAddress, rules).valid
+              }
+              onClick={() => handleUpdateAddress()}
+              class={handles.changeLocationSubmitButton}
+            >
+              <FormattedMessage id="store/shopper-location.change-location.submit" />
+            </Button>
+          </section>
+        </div>
+        <div className="flex-grow-1 relative">
+          <MapContainer
+            geoCoordinates={storedAddress.geoCoordinates.value}
+            googleMapsApiKey={data.logistics.googleMapsKey}
+            intl={intl}
           />
-          <PostalCodeGetter
-            address={storedAddress}
-            Input={StyleguideInput}
-            onChangeAddress={(newAddress: AddressFormFields) =>
-              handleAddressChange(newAddress)
-            }
-          />
-        </AddressContainer>
-      </section>
-      <section className={`${handles.changeLocationSubmitContainer} mt7`}>
-        <Button
-          variation="primary"
-          disabled={
-            !storedAddress || !isValidAddress(storedAddress, rules).valid
-          }
-          onClick={() => handleUpdateAddress()}
-          class={handles.changeLocationSubmitButton}
-        >
-          <FormattedMessage id="store/shopper-location.change-location.submit" />
-        </Button>
-      </section>
+        </div>
+      </div>
     </div>
   )
 }

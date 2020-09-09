@@ -25,6 +25,8 @@ const {
   validateAddress,
 } = helpers
 
+let geoTimeout: any = null
+
 interface AddressProps {
   rules: any
   currentAddress: AddressFormFields
@@ -45,6 +47,39 @@ const geolocationOptions = {
   enableHighAccuracy: true,
   maximumAge: 30000,
   timeout: 10000,
+}
+
+const getGeolocation = async (key: string, address: any) => {
+  const query = encodeURIComponent(
+    String(
+      `${address.number?.value || ''} ${address.street?.value || ''} ${address
+        .postalCode?.value || ''} ${address.city?.value || ''} ${address.state
+        ?.value || ''}`
+    ).trim()
+  )
+  let results: any = []
+  let geolocation: any = []
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`
+    )
+    results = await response.json()
+    if (results.results.length) {
+      const {
+        results: [result],
+      } = results
+      const {
+        geometry: {
+          location: { lat, lng },
+        },
+      } = result
+      geolocation = [lng, lat]
+    }
+  } catch (err) {
+    return geolocation
+  }
+
+  return geolocation
 }
 
 const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
@@ -154,10 +189,42 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   function handleAddressChange(newAddress: AddressFormFields) {
+    clearTimeout(geoTimeout)
     const curAddress = storedAddress
     const combinedAddress = { ...curAddress, ...newAddress }
     const validatedAddress = validateAddress(combinedAddress, rules)
+
+    geoTimeout = setTimeout(() => {
+      getGeolocation(data.logistics.googleMapsKey, validatedAddress).then(
+        (res: any) => {
+          if (res.length) {
+            setStoredAddress({
+              ...validatedAddress,
+              geoCoordinates: {
+                value: res,
+              },
+            })
+          }
+        }
+      )
+    }, 2000)
+
     setStoredAddress(validatedAddress)
+  }
+
+  if (!storedAddress.geoCoordinates.value.length) {
+    getGeolocation(data.logistics.googleMapsKey, storedAddress).then(
+      (res: any) => {
+        if (res.length) {
+          setStoredAddress({
+            ...storedAddress,
+            geoCoordinates: {
+              value: res,
+            },
+          })
+        }
+      }
+    )
   }
 
   return (

@@ -20,7 +20,9 @@ const mapStyles = {
   top: 0,
   zIndex: 0,
 }
-
+let map: any = null
+let marker: any = null
+let last: string = ''
 const { GoogleMapsContainer } = components
 
 const MapContainer: FunctionComponent<MapContainerProps> = ({
@@ -67,10 +69,10 @@ const Map: FunctionComponent<MapProps> = ({ googleMaps, geoCoordinates }) => {
     ],
   }
 
-  useEffect(() => {
-    if (!mapDiv.current) return
+  const setMap = () => {
     const location = getLocation(geoCoordinates)
-    const map = new googleMaps.Map(mapDiv.current, {
+    last = geoCoordinates.join('')
+    map = new googleMaps.Map(mapDiv.current, {
       center: location,
       ...mapOptions,
     })
@@ -82,10 +84,19 @@ const Map: FunctionComponent<MapProps> = ({ googleMaps, geoCoordinates }) => {
       icon: markerIconBlue,
     }
 
-    const marker = new googleMaps.Marker(markerOptions)
+    marker = new googleMaps.Marker(markerOptions)
 
     marker.setPosition(location)
+  }
+
+  useEffect(() => {
+    if (!mapDiv.current) return
+    setMap()
   }, [location, mapDiv])
+
+  if (!!marker && last !== geoCoordinates.join('')) {
+    setMap()
+  }
 
   if (!googleMaps || !geoCoordinates.length) return null
 

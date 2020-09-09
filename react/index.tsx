@@ -15,8 +15,6 @@ const geolocationOptions = {
   timeout: 10000,
 }
 
-const getCountryISO3 = require('country-iso-2-to-3')
-
 const AddressChallenge: FunctionComponent = ({ children }) => {
   const [updateAddress] = useMutation(UpdateOrderFormShipping)
   const { loading, data, refetch } = useQuery(Address, { ssr: false })
@@ -68,7 +66,11 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
       },
     })
       .catch(() => null)
-      .then(() => setRenderChildren(true))
+      .then(() => {
+        const event = new Event('locationUpdated')
+        window.dispatchEvent(event)
+        setRenderChildren(true)
+      })
   }
 
   const handleError = () => {
@@ -83,30 +85,15 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
       .then(res => res.json())
       .then(async res => {
         const { location } = res
-        let addressFields = {
-          addressType: 'residential',
-          street: '',
-          number: '',
-          neighborhood: '',
-          city: location.city,
-          postalCode: location.postalCode,
-          receiverName: '',
-          state: location.region,
-          country: getCountryISO3(location.country),
-          geoCoordinates:
-            location.lat && location.lng ? [location.lat, location.lng] : null,
-        }
-        if (!addressFields.postalCode) {
-          if (!location.lat || !location.lng) return
-          const parsedResponse = await requestGoogleMapsApi({
-            lat: location.lat,
-            long: location.lng,
-          })
-          if (!parsedResponse.results.length) return
-          addressFields = getParsedAddress(parsedResponse.results[0])
-          addressFields.number = ''
-          addressFields.street = ''
-        }
+        if (!location.lat || !location.lng) return
+        const parsedResponse = await requestGoogleMapsApi({
+          lat: location.lat,
+          long: location.lng,
+        })
+        if (!parsedResponse.results.length) return
+        let addressFields = getParsedAddress(parsedResponse.results[0])
+        addressFields.number = ''
+        addressFields.street = ''
         const { orderFormId } = data.orderForm
         await updateAddress({
           variables: {
@@ -115,7 +102,11 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
           },
         })
           .catch(() => null)
-          .then(() => setRenderChildren(true))
+          .then(() => {
+            const event = new Event('locationUpdated')
+            window.dispatchEvent(event)
+            setRenderChildren(true)
+          })
       })
   }
 

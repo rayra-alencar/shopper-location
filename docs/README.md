@@ -28,7 +28,7 @@ A block is also provided which renders a form allowing the user to manually chan
 
 ```json
     "vtex.store-components": "3.x",
-    "vtex.modal": "0.x",
+    "vtex.modal-layout": "0.x",
     "vtex.shopper-location": "0.x"
 ```
 
@@ -36,19 +36,39 @@ A block is also provided which renders a form allowing the user to manually chan
 
 ```json
 "shopper-location": {
-    "children": ["user-address"]
+    "children": ["modal-trigger#address"]
+  },
+  "modal-trigger#address": {
+    "children": ["user-address", "modal-layout#address"]
   },
   "user-address": {
-    "blocks": ["modal#address"],
     "props": {
       "variation": "bar",
       "showStreet": false,
       "showCityAndState": true,
       "showPostalCode": true,
-      "showPrefix": false
+      "showPrefix": false,
+      "showIfEmpty": true
     }
   },
-  "modal#address": {
+  "modal-layout#address": {
+    "children": ["modal-header#address", "modal-content#address"]
+  },
+  "modal-header#address": {
+    "children": ["flex-layout.col#address-header"]
+  },
+  "flex-layout.col#address-header": {
+    "children": ["rich-text#address-header"],
+    "props": {
+      "paddingLeft": 5
+    }
+  },
+  "rich-text#address-header": {
+    "props": {
+      "text": "### Change Location"
+    }
+  },
+  "modal-content#address": {
     "children": ["change-location"]
   },
 ```
@@ -77,6 +97,21 @@ A block is also provided which renders a form allowing the user to manually chan
     ]
   },
 ```
+
+## Customization
+
+In order to apply CSS customizations in this and other blocks, follow the instructions given in the recipe on [Using CSS Handles for store customization](https://vtex.io/docs/recipes/style/using-css-handles-for-store-customization).
+
+| CSS Handles                       |
+| --------------------------------- |
+| `changeLocationAddressContainer`  |
+| `changeLocationContainer`         |
+| `changeLocationGeoContainer`      |
+| `changeLocationGeoErrorContainer` |
+| `changeLocationGeolocationButton` |
+| `changeLocationSubmitContainer`   |
+| `changeLocationSubmitButton`      |
+| `changeLocationTitle`             |
 
 ## Contributors ✨
 

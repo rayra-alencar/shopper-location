@@ -26,9 +26,10 @@
     "vtex.apps-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.apps-graphql@2.5.1/public/@types/vtex.apps-graphql",
     "vtex.css-handles": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles",
     "vtex.modal": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal@0.2.2/public/@types/vtex.modal",
-    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.112.0/public/@types/vtex.render-runtime",
-    "vtex.store-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.130.0/public/@types/vtex.store-graphql",
-    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.128.1/public/@types/vtex.styleguide"
+    "vtex.modal-layout": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal-layout@0.7.1/public/@types/vtex.modal-layout",
+    "vtex.render-runtime": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.120.0/public/@types/vtex.render-runtime",
+    "vtex.store-graphql": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.131.2/public/@types/vtex.store-graphql",
+    "vtex.styleguide": "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.129.0/public/@types/vtex.styleguide"
   },
   "version": "0.1.0"
 }

@@ -1,10 +1,11 @@
-import React, { useState, FunctionComponent } from 'react'
-import { useQuery, useMutation } from 'react-apollo'
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
+import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
-import { useModal } from 'vtex.modal/ModalContext'
+import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
 import {
   AddressContainer,
   AddressForm as AddressFields,
+  CountrySelector,
   inputs,
   helpers,
   PostalCodeGetter,
@@ -12,9 +13,9 @@ import {
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
 import MapContainer from './Map'
-import { getParsedAddress } from './helpers/getParsedAddress'
-import updateOrderFormShipping from './graphql/UpdateOrderFormShipping.graphql'
-import getGoogleMapsKey from './graphql/GetGoogleMapsKey.graphql'
+import { useLocationState, useLocationDispatch } from './LocationContext'
+import { getParsedAddress } from '../helpers/getParsedAddress'
+import updateOrderFormShipping from '../graphql/UpdateOrderFormShipping.graphql'
 
 const { StyleguideInput } = inputs
 const {
@@ -26,10 +27,13 @@ const {
 } = helpers
 
 let geoTimeout: any = null
+let loadingTimeout: any = null
 
 interface AddressProps {
   rules: any
   currentAddress: AddressFormFields
+  shipsTo: string[]
+  googleMapsKey: string
   orderFormId: string
 }
 
@@ -38,6 +42,7 @@ const CSS_HANDLES = [
   'changeLocationTitle',
   'changeLocationAddressContainer',
   'changeLocationGeoContainer',
+  'changeLocationGeoErrorContainer',
   'changeLocationSubmitContainer',
   'changeLocationSubmitButton',
   'changeLocationGeolocationButton',
@@ -57,6 +62,7 @@ const getGeolocation = async (key: string, address: any) => {
         ?.value || ''}`
     ).trim()
   )
+  if (!query) return
   let results: any = []
   let geolocation: any = []
   try {
@@ -86,25 +92,42 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   intl,
   rules,
   currentAddress,
+  shipsTo,
   orderFormId,
+  googleMapsKey,
 }) => {
-  const { closeModal } = useModal()
-  const { data } = useQuery(getGoogleMapsKey, { ssr: false })
+  const dispatch = useModalDispatch()
+  const { location } = useLocationState()
+  const locationDispatch = useLocationDispatch()
+  const [countryError, setCountryError] = useState(false)
+  const [locationLoading, setLocationLoading] = useState(false)
+  const [geoLoading, setGeoLoading] = useState(false)
+  const isMountedRef = useRef(false)
   const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
 
-  const addressWithValidation = addValidation({
-    addressQuery: null,
-    ...currentAddress,
-  })
-  const [storedAddress, setStoredAddress] = useState(addressWithValidation)
+  useEffect(() => {
+    isMountedRef.current = true
+    const addressWithValidation = addValidation(currentAddress)
+    if (isMountedRef.current) {
+      locationDispatch({
+        type: 'SET_LOCATION',
+        args: {
+          address: addressWithValidation,
+        },
+      })
+    }
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
 
   const requestGoogleMapsApi = async (params: {
     lat: number
     long: number
   }) => {
     const { lat, long } = params
-    const baseUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=${data.logistics.googleMapsKey}&`
+    const baseUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=${googleMapsKey}&`
     let suffix = ''
     if (lat && long) {
       suffix = `latlng=${lat},${long}`
@@ -124,10 +147,21 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       lat: latitude,
       long: longitude,
     })
-    if (!parsedResponse.results.length) return
+    if (!parsedResponse.results.length) {
+      setGeoLoading(false)
+      clearTimeout(loadingTimeout)
+      return
+    }
 
     // save geolocation to state
     const addressFields = getParsedAddress(parsedResponse.results[0])
+    if (!shipsTo.includes(addressFields.country)) {
+      setCountryError(true)
+      setGeoLoading(false)
+      clearTimeout(loadingTimeout)
+      return
+    }
+
     const geolocatedAddress = {
       addressQuery: null,
       neighborhood: addressFields.neighborhood || '',
@@ -139,20 +173,32 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       addressType: addressFields.addressType || '',
       geoCoordinates: addressFields.geoCoordinates || [],
       state: addressFields.state || '',
-      receiverName: storedAddress.receiverName.value || '',
+      receiverName: location.receiverName.value || '',
       reference: '',
       country: addressFields.country || '',
     }
     const fieldsWithValidation = addValidation(geolocatedAddress)
     const validatedFields = validateAddress(fieldsWithValidation, rules)
-    setStoredAddress(validatedFields)
+    locationDispatch({
+      type: 'SET_LOCATION',
+      args: {
+        address: validatedFields,
+      },
+    })
+    setGeoLoading(false)
+    clearTimeout(loadingTimeout)
   }
 
   const handleError = () => {
+    setGeoLoading(false)
+    clearTimeout(loadingTimeout)
     return
   }
 
   const handleGeolocation = () => {
+    loadingTimeout = setTimeout(() => {
+      setGeoLoading(true)
+    }, 500)
     navigator.geolocation.getCurrentPosition(
       handleSuccess,
       handleError,
@@ -161,7 +207,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   const handleUpdateAddress = () => {
-    let newAddress = removeValidation(storedAddress)
+    setLocationLoading(true)
+    let newAddress = removeValidation(location)
     updateAddress({
       variables: {
         orderFormId,
@@ -184,69 +231,91 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       .then(() => {
         const event = new Event('locationUpdated')
         window.dispatchEvent(event)
-        closeModal && closeModal()
+        dispatch && dispatch({ type: 'CLOSE_MODAL' })
       })
   }
 
   function handleAddressChange(newAddress: AddressFormFields) {
     clearTimeout(geoTimeout)
-    const curAddress = storedAddress
+    const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
     const validatedAddress = validateAddress(combinedAddress, rules)
 
     geoTimeout = setTimeout(() => {
-      getGeolocation(data.logistics.googleMapsKey, validatedAddress).then(
-        (res: any) => {
-          if (res.length) {
-            setStoredAddress({
-              ...validatedAddress,
-              geoCoordinates: {
-                value: res,
+      getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
+        console.log(res)
+        if (res && res.length && isMountedRef.current) {
+          locationDispatch({
+            type: 'SET_LOCATION',
+            args: {
+              address: {
+                ...validatedAddress,
+                geoCoordinates: {
+                  value: res,
+                },
               },
-            })
-          }
-        }
-      )
-    }, 2000)
-
-    setStoredAddress(validatedAddress)
-  }
-
-  if (!storedAddress.geoCoordinates.value.length) {
-    getGeolocation(data.logistics.googleMapsKey, storedAddress).then(
-      (res: any) => {
-        if (res.length) {
-          setStoredAddress({
-            ...storedAddress,
-            geoCoordinates: {
-              value: res,
             },
           })
         }
-      }
-    )
+      })
+    }, 2500)
+
+    if (isMountedRef.current) {
+      locationDispatch({
+        type: 'SET_LOCATION',
+        args: {
+          address: validatedAddress,
+        },
+      })
+    }
   }
 
+  function translateCountries() {
+    if (
+      location?.country?.value &&
+      !shipsTo.includes(location.country.value as string)
+    ) {
+      shipsTo.push(location.country.value as string)
+    }
+    return shipsTo.map((code: string) => ({
+      label: intl.formatMessage({
+        id: `store/shopper-location.countries.${code}`,
+      }),
+      value: code,
+    }))
+  }
+
+  const shipCountries = translateCountries()
+
   return (
-    <div className={`${handles.changeLocationContainer} w-100`}>
-      <h2 className={`${handles.changeLocationTitle} heading-2`}>
-        <FormattedMessage id="store/shopper-location.change-location.title" />
-      </h2>
+    <div
+      className={`${handles.changeLocationContainer} w-100`}
+      style={{ minWidth: 800 }}
+    >
       <div className="flex flex-auto">
         <div className="mr5">
           <section className={handles.changeLocationGeoContainer}>
-            <ButtonWithIcon
-              variation="primary"
-              icon={<IconLocation />}
-              onClick={() => handleGeolocation()}
-              class={handles.changeLocationGeolocationButton}
-            >
-              <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-            </ButtonWithIcon>
+            {countryError ? (
+              <div
+                className={`${handles.changeLocationGeoErrorContainer} mt2 red`}
+              >
+                <FormattedMessage id="store/shopper-location.change-location.error-country" />
+              </div>
+            ) : (
+              <ButtonWithIcon
+                variation="primary"
+                icon={<IconLocation />}
+                onClick={() => handleGeolocation()}
+                class={handles.changeLocationGeolocationButton}
+                isLoading={geoLoading}
+              >
+                <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
+              </ButtonWithIcon>
+            )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
             <AddressContainer
-              address={storedAddress}
+              address={location}
               Input={StyleguideInput}
               rules={rules}
               onChangeAddress={(newAddress: AddressFormFields) =>
@@ -254,8 +323,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
               }
               autoCompletePostalCode={false}
             >
+              <CountrySelector shipsTo={shipCountries} />
               <AddressFields
-                address={storedAddress}
+                address={location}
                 Input={StyleguideInput}
                 omitAutoCompletedFields={false}
                 omitPostalCodeFields={true}
@@ -268,7 +338,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 })}
               />
               <PostalCodeGetter
-                address={storedAddress}
+                address={location}
                 Input={StyleguideInput}
                 onChangeAddress={(newAddress: AddressFormFields) =>
                   handleAddressChange(newAddress)
@@ -279,11 +349,10 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button
               variation="primary"
-              disabled={
-                !storedAddress || !isValidAddress(storedAddress, rules).valid
-              }
+              disabled={!location || !isValidAddress(location, rules).valid}
               onClick={() => handleUpdateAddress()}
               class={handles.changeLocationSubmitButton}
+              isLoading={locationLoading}
             >
               <FormattedMessage id="store/shopper-location.change-location.submit" />
             </Button>
@@ -291,8 +360,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         </div>
         <div className="flex-grow-1 relative">
           <MapContainer
-            geoCoordinates={storedAddress.geoCoordinates.value}
-            googleMapsApiKey={data.logistics.googleMapsKey}
+            geoCoordinates={location.geoCoordinates.value}
+            googleMapsApiKey={googleMapsKey}
             intl={intl}
           />
         </div>

@@ -4656,21 +4656,25 @@ verror@1.10.0:
   version "0.4.4"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles#8c45c6decf9acd2b944e07261686decff93d6422"
 
+"vtex.modal-layout@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal-layout@0.7.1/public/@types/vtex.modal-layout":
+  version "0.7.1"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal-layout@0.7.1/public/@types/vtex.modal-layout#bf33f92fa37def43aef5b93150b6afcaa3433766"
+
 "vtex.modal@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal@0.2.2/public/@types/vtex.modal":
   version "0.2.2"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.modal@0.2.2/public/@types/vtex.modal#164c756a020e0f960f65b8c9550a7cb080d42edb"
 
-"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.112.0/public/@types/vtex.render-runtime":
-  version "8.112.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.112.0/public/@types/vtex.render-runtime#d24f7d970497a80e1e38864db09bbe5da61e0696"
+"vtex.render-runtime@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.120.0/public/@types/vtex.render-runtime":
+  version "8.120.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.render-runtime@8.120.0/public/@types/vtex.render-runtime#c5288e637b3bfb8854a48585feefe4992c0a2d80"
 
-"vtex.store-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.130.0/public/@types/vtex.store-graphql":
-  version "2.130.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.130.0/public/@types/vtex.store-graphql#4c1bd572898fc9382c5b8e5eeca8fa757c6f38ce"
+"vtex.store-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.131.2/public/@types/vtex.store-graphql":
+  version "2.131.2"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.131.2/public/@types/vtex.store-graphql#cee295ff3132cdce665d65781684c9423d2ca02a"
 
-"vtex.styleguide@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.128.1/public/@types/vtex.styleguide":
-  version "9.128.1"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.128.1/public/@types/vtex.styleguide#8d506f94fa277fdf5ce2e2379d03bd030d74c2a9"
+"vtex.styleguide@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.129.0/public/@types/vtex.styleguide":
+  version "9.129.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.styleguide@9.129.0/public/@types/vtex.styleguide#916e6fbd7f14585c9e07e040d41d8966860affba"
 
 w3c-hr-time@^1.0.1:
   version "1.0.2"

@@ -1,3 +1,3 @@
-declare module 'vtex.modal/ModalContext' {
-  export function useModal(): any
+declare module 'vtex.modal-layout/ModalContext' {
+  export function useModalDispatch(): any
 }

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Allow shopper to change country (options shown will be the countries that the store ships to plus the country the shopper is currently located in)
+
+### Changed
+
+- Update docs to recommend `modal-layout` and list CSS handles
+
 ## [0.1.0] - 2020-09-09
 
 ### Added

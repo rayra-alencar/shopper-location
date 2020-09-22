@@ -3,7 +3,7 @@ import { path, compose } from 'ramda'
 import { useQuery, useMutation } from 'react-apollo'
 import { getParsedAddress } from './helpers/getParsedAddress'
 import Address from './graphql/GetOrderForm.graphql'
-import GetGoogleMapsKey from './graphql/GetGoogleMapsKey.graphql'
+import Logistics from './graphql/Logistics.graphql'
 import UpdateOrderFormShipping from './graphql/UpdateOrderFormShipping.graphql'
 import AppSettings from './graphql/AppSettings.graphql'
 
@@ -15,10 +15,24 @@ const geolocationOptions = {
   timeout: 10000,
 }
 
+// const fallbackAddress = {
+//   neighborhood: '',
+//   complement: '',
+//   number: '',
+//   street: '',
+//   postalCode: '9999999999',
+//   city: '',
+//   addressType: '',
+//   geoCoordinates: [],
+//   state: '',
+//   receiverName: '',
+//   country: '',
+// }
+
 const AddressChallenge: FunctionComponent = ({ children }) => {
   const [updateAddress] = useMutation(UpdateOrderFormShipping)
   const { loading, data, refetch } = useQuery(Address, { ssr: false })
-  const { data: logisticsData } = useQuery(GetGoogleMapsKey, { ssr: false })
+  const { data: logisticsData } = useQuery(Logistics, { ssr: false })
   const { data: appSettingsData } = useQuery(AppSettings, {
     variables: {
       version: process.env.VTEX_APP_VERSION,
@@ -55,9 +69,14 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
     if (!parsedResponse.results.length) return
 
     // save geolocation to orderForm
-    const addressFields = getParsedAddress(parsedResponse.results[0])
+    // const { shipsTo = [] } = logisticsData?.logistics
+    let addressFields = getParsedAddress(parsedResponse.results[0])
     addressFields.number = ''
     addressFields.street = ''
+    // if (!shipsTo.includes(addressFields.country)) {
+    //   addressFields = fallbackAddress
+    //   addressFields.country = shipsTo[0]
+    // }
     const { orderFormId } = data.orderForm
     await updateAddress({
       variables: {
@@ -69,7 +88,6 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
       .then(() => {
         const event = new Event('locationUpdated')
         window.dispatchEvent(event)
-        setRenderChildren(true)
       })
   }
 
@@ -91,9 +109,15 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
           long: location.lng,
         })
         if (!parsedResponse.results.length) return
+
+        // const { shipsTo = [] } = logisticsData?.logistics
         let addressFields = getParsedAddress(parsedResponse.results[0])
         addressFields.number = ''
         addressFields.street = ''
+        // if (!shipsTo.includes(addressFields.country)) {
+        //   addressFields = fallbackAddress
+        //   addressFields.country = shipsTo[0]
+        // }
         const { orderFormId } = data.orderForm
         await updateAddress({
           variables: {
@@ -105,22 +129,25 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
           .then(() => {
             const event = new Event('locationUpdated')
             window.dispatchEvent(event)
-            setRenderChildren(true)
           })
       })
   }
 
   useEffect(() => {
-    window.addEventListener('locationUpdated', () => {
-      refetch()
-    })
+    const handleLocationUpdated = () => refetch()
+
+    window.addEventListener('locationUpdated', handleLocationUpdated)
+
+    return () => {
+      window.removeEventListener('locationUpdated', handleLocationUpdated)
+    }
   }, [])
 
   useEffect(() => {
     if (loading || !data?.orderForm || !logisticsData?.logistics?.googleMapsKey)
       return
+    setRenderChildren(true)
     if (hasShippingAddress(data.orderForm)) {
-      setRenderChildren(true)
       return
     }
     navigator.geolocation.getCurrentPosition(

@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, FunctionComponent } from 'react'
+import React, { useEffect, useState, useRef, FunctionComponent } from 'react'
 import { components } from 'vtex.address-form'
-import markerIconBlue from './assets/icons/marker.svg'
+import markerIconBlue from '../assets/icons/marker.svg'
 
 interface MapContainerProps {
   googleMapsApiKey: string
-  geoCoordinates: string[]
+  geoCoordinates: any
   intl: any
 }
 
 interface MapProps {
-  geoCoordinates: string[]
+  geoCoordinates: number[]
   googleMaps: any
 }
 
@@ -22,7 +22,6 @@ const mapStyles = {
 }
 let map: any = null
 let marker: any = null
-let last: string = ''
 const { GoogleMapsContainer } = components
 
 const MapContainer: FunctionComponent<MapContainerProps> = ({
@@ -42,7 +41,8 @@ const MapContainer: FunctionComponent<MapContainerProps> = ({
 }
 
 const Map: FunctionComponent<MapProps> = ({ googleMaps, geoCoordinates }) => {
-  const getLocation = (geoCoordinates: string[]) => {
+  const [last, setLast] = useState('')
+  const getLocation = (geoCoordinates: number[]) => {
     const [lng, lat] = geoCoordinates
     const location = new googleMaps.LatLng(lat, lng)
     return location
@@ -71,7 +71,6 @@ const Map: FunctionComponent<MapProps> = ({ googleMaps, geoCoordinates }) => {
 
   const setMap = () => {
     const location = getLocation(geoCoordinates)
-    last = geoCoordinates.join('')
     map = new googleMaps.Map(mapDiv.current, {
       center: location,
       ...mapOptions,
@@ -90,13 +89,10 @@ const Map: FunctionComponent<MapProps> = ({ googleMaps, geoCoordinates }) => {
   }
 
   useEffect(() => {
-    if (!mapDiv.current) return
+    if (!mapDiv.current || last === geoCoordinates.join('')) return
+    setLast(geoCoordinates.join(''))
     setMap()
-  }, [location, mapDiv])
-
-  if (!!marker && last !== geoCoordinates.join('')) {
-    setMap()
-  }
+  }, [mapDiv, geoCoordinates])
 
   if (!googleMaps || !geoCoordinates.length) return null
 

@@ -12,6 +12,7 @@ import {
 } from 'vtex.address-form'
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
+import { useDevice } from 'vtex.device-detector'
 import MapContainer from './Map'
 import { useLocationState, useLocationDispatch } from './LocationContext'
 import { getParsedAddress } from '../helpers/getParsedAddress'
@@ -105,6 +106,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const isMountedRef = useRef(false)
   const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
+  const { isMobile } = useDevice()
 
   useEffect(() => {
     isMountedRef.current = true
@@ -290,7 +292,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   return (
     <div
       className={`${handles.changeLocationContainer} w-100`}
-      style={{ minWidth: 800 }}
+      style={!isMobile ? { minWidth: 800 } : {}}
     >
       <div className="flex flex-auto">
         <div className="mr5">
@@ -358,13 +360,15 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             </Button>
           </section>
         </div>
-        <div className="flex-grow-1 relative">
-          <MapContainer
-            geoCoordinates={location.geoCoordinates.value}
-            googleMapsApiKey={googleMapsKey}
-            intl={intl}
-          />
-        </div>
+        {!isMobile && (
+          <div className="flex-grow-1 relative">
+            <MapContainer
+              geoCoordinates={location.geoCoordinates.value}
+              googleMapsApiKey={googleMapsKey}
+              intl={intl}
+            />
+          </div>
+        )}
       </div>
     </div>
   )

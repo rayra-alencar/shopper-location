@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Error message if user has blocked browser location but tries to use `Find My Location` button
+
+### Fixed
+
+- `addressType` field will be automatically set if user inputs address manually
+
 ## [0.1.2] - 2020-09-22
 
 ### Fixed

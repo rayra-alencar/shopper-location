@@ -38,7 +38,7 @@ const ChangeLocation: FunctionComponent<WrappedComponentProps> = ({ intl }) => {
     street: queriedAddress?.street || '',
     postalCode: queriedAddress?.postalCode || '',
     city: queriedAddress?.city || '',
-    addressType: queriedAddress?.addressType || '',
+    addressType: queriedAddress?.addressType || 'residential',
     geoCoordinates: queriedAddress?.geoCoordinates || [],
     state: queriedAddress?.state || '',
     receiverName: queriedAddress?.receiverName || '',

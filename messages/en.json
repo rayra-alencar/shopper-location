@@ -3,6 +3,7 @@
   "store/shopper-location.change-location.addressNotApplicable": "Not applicable",
   "store/shopper-location.change-location.trigger-geolocation": "Find my location",
   "store/shopper-location.change-location.error-country": "Sorry, shipping is not available for your location.",
+  "store/shopper-location.change-location.error-permission": "Failed to find your location. Please check that you have granted permission for this site to use your location.",
   "store/shopper-location.change-location.submit": "SAVE",
 
   "store/shopper-location.countries.ABW": "Aruba",

@@ -3,6 +3,7 @@
   "store/shopper-location.change-location.addressNotApplicable": "store/shopper-location.change-location.addressNotApplicable",
   "store/shopper-location.change-location.trigger-geolocation": "store/shopper-location.change-location.trigger-geolocation",
   "store/shopper-location.change-location.error-country": "store/shopper-location.change-location.error-country",
+  "store/shopper-location.change-location.error-permission": "store/shopper-location.change-location.error-permission",
   "store/shopper-location.change-location.submit": "store/shopper-location.change-location.submit",
 
   "store/shopper-location.countries.ABW": "store/shopper-location.countries.ABW",

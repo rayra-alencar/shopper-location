@@ -22,7 +22,7 @@ const addressWithoutValidation = {
   street: '',
   postalCode: '',
   city: '',
-  addressType: '',
+  addressType: 'residential',
   geoCoordinates: [],
   state: '',
   receiverName: '',

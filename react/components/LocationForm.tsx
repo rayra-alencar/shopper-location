@@ -101,6 +101,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const { location } = useLocationState()
   const locationDispatch = useLocationDispatch()
   const [countryError, setCountryError] = useState(false)
+  const [geoError, setGeoError] = useState(false)
   const [locationLoading, setLocationLoading] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const isMountedRef = useRef(false)
@@ -192,6 +193,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   const handleError = () => {
+    setGeoError(true)
     setGeoLoading(false)
     clearTimeout(loadingTimeout)
     return
@@ -302,6 +304,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 className={`${handles.changeLocationGeoErrorContainer} mt2 red`}
               >
                 <FormattedMessage id="store/shopper-location.change-location.error-country" />
+              </div>
+            ) : geoError ? (
+              <div
+                className={`${handles.changeLocationGeoErrorContainer} mt2 red`}
+              >
+                <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
               <ButtonWithIcon

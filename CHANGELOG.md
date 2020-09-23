@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.3] - 2020-09-23
+
 ### Added
 
 - Error message if user has blocked browser location but tries to use `Find My Location` button

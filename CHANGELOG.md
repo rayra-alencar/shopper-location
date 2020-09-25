@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.4] - 2020-09-25
+
 ### Fixed
 
 - Change priority of fields from Google response to determine shopper's city

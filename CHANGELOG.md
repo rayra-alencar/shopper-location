@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+
+- Change priority of fields from Google response to determine shopper's city
+- Add maxWidth to "Find My Location" error message container on location form
+
 ## [0.1.3] - 2020-09-23
 
 ### Added

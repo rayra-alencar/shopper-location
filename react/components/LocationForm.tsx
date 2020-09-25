@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
@@ -13,6 +15,7 @@ import {
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
 import { useDevice } from 'vtex.device-detector'
+
 import MapContainer from './Map'
 import { useLocationState, useLocationDispatch } from './LocationContext'
 import { getParsedAddress } from '../helpers/getParsedAddress'
@@ -63,23 +66,28 @@ const getGeolocation = async (key: string, address: any) => {
         ?.value || ''}`
     ).trim()
   )
+
   if (!query) return
   let results: any = []
   let geolocation: any = []
+
   try {
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`
     )
+
     results = await response.json()
     if (results.results.length) {
       const {
         results: [result],
       } = results
+
       const {
         geometry: {
           location: { lat, lng },
         },
       } = result
+
       geolocation = [lng, lat]
     }
   } catch (err) {
@@ -112,6 +120,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   useEffect(() => {
     isMountedRef.current = true
     const addressWithValidation = addValidation(currentAddress)
+
     if (isMountedRef.current) {
       locationDispatch({
         type: 'SET_LOCATION',
@@ -120,6 +129,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         },
       })
     }
+
     return () => {
       isMountedRef.current = false
     }
@@ -132,11 +142,14 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     const { lat, long } = params
     const baseUrl = `https://maps.googleapis.com/maps/api/geocode/json?key=${googleMapsKey}&`
     let suffix = ''
+
     if (lat && long) {
       suffix = `latlng=${lat},${long}`
     }
+
     try {
       const response = await fetch(baseUrl + suffix)
+
       return await response.json()
     } catch (err) {
       return { results: [] }
@@ -150,18 +163,22 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       lat: latitude,
       long: longitude,
     })
+
     if (!parsedResponse.results.length) {
       setGeoLoading(false)
       clearTimeout(loadingTimeout)
+
       return
     }
 
     // save geolocation to state
     const addressFields = getParsedAddress(parsedResponse.results[0])
+
     if (!shipsTo.includes(addressFields.country)) {
       setCountryError(true)
       setGeoLoading(false)
       clearTimeout(loadingTimeout)
+
       return
     }
 
@@ -174,14 +191,16 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       postalCode: addressFields.postalCode || '',
       city: addressFields.city || '',
       addressType: addressFields.addressType || '',
-      geoCoordinates: addressFields.geoCoordinates || [],
+      geoCoordinates: addressFields.geoCoordinates ?? [],
       state: addressFields.state || '',
-      receiverName: location.receiverName.value || '',
+      receiverName: location.receiverName.value ?? '',
       reference: '',
       country: addressFields.country || '',
     }
+
     const fieldsWithValidation = addValidation(geolocatedAddress)
     const validatedFields = validateAddress(fieldsWithValidation, rules)
+
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -196,7 +215,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     setGeoError(true)
     setGeoLoading(false)
     clearTimeout(loadingTimeout)
-    return
   }
 
   const handleGeolocation = () => {
@@ -212,7 +230,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
   const handleUpdateAddress = () => {
     setLocationLoading(true)
-    let newAddress = removeValidation(location)
+    const newAddress = removeValidation(location)
+
     updateAddress({
       variables: {
         orderFormId,
@@ -234,8 +253,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       .catch(() => null)
       .then(() => {
         const event = new Event('locationUpdated')
+
         window.dispatchEvent(event)
-        dispatch && dispatch({ type: 'CLOSE_MODAL' })
+        dispatch?.({ type: 'CLOSE_MODAL' })
       })
   }
 
@@ -247,8 +267,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
     geoTimeout = setTimeout(() => {
       getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
-        console.log(res)
-        if (res && res.length && isMountedRef.current) {
+        if (res?.length && isMountedRef.current) {
           locationDispatch({
             type: 'SET_LOCATION',
             args: {
@@ -281,6 +300,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     ) {
       shipsTo.push(location.country.value as string)
     }
+
     return shipsTo.map((code: string) => ({
       label: intl.formatMessage({
         id: `store/shopper-location.countries.${code}`,
@@ -302,12 +322,14 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             {countryError ? (
               <div
                 className={`${handles.changeLocationGeoErrorContainer} mt2 red`}
+                style={{ maxWidth: 300 }}
               >
                 <FormattedMessage id="store/shopper-location.change-location.error-country" />
               </div>
             ) : geoError ? (
               <div
                 className={`${handles.changeLocationGeoErrorContainer} mt2 red`}
+                style={{ maxWidth: 300 }}
               >
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
@@ -338,7 +360,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 address={location}
                 Input={StyleguideInput}
                 omitAutoCompletedFields={false}
-                omitPostalCodeFields={true}
+                omitPostalCodeFields
                 onChangeAddress={(newAddress: AddressFormFields) =>
                   handleAddressChange(newAddress)
                 }

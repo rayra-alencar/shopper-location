@@ -39,6 +39,7 @@ const initialLocationState = {
 const LocationStateContext = React.createContext<LocationContextProps>(
   initialLocationState
 )
+
 const LocationDispatchContext = React.createContext<Dispatch | undefined>(
   undefined
 )
@@ -53,6 +54,7 @@ function reducer(
         ...state,
         location: action.args.address,
       }
+
     default:
       return state
   }
@@ -62,6 +64,7 @@ const LocationContextProvider: FunctionComponent<LocationContextProps> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialLocationState)
+
   return (
     <LocationStateContext.Provider value={state}>
       <LocationDispatchContext.Provider value={dispatch}>
@@ -73,11 +76,13 @@ const LocationContextProvider: FunctionComponent<LocationContextProps> = ({
 
 function useLocationState() {
   const context = useContext(LocationStateContext)
+
   if (context === undefined) {
     throw new Error(
       'useLocationState must be used within a LocationStateContextProvider'
     )
   }
+
   return context
 }
 
@@ -89,6 +94,7 @@ function useLocationDispatch() {
       'useLocationDispatch must be used within a LocationDispatchContextProvider'
     )
   }
+
   return context
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
@@ -132,7 +133,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     return () => {
       isMountedRef.current = false
     }
-  }, [currentAddress, locationDispatch])
+  }, [])
 
   const requestGoogleMapsApi = async (params: {
     lat: number

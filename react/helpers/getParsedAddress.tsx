@@ -38,8 +38,8 @@ export const getParsedAddress = (place: {
   const address = {
     addressType: 'residential',
     city:
-      parsedAddressComponents.administrative_area_level_3 ||
       parsedAddressComponents.locality ||
+      parsedAddressComponents.administrative_area_level_3 ||
       parsedAddressComponents.administrative_area_level_2,
     // complement: '',
     /* Google Maps API returns Alpha-2 ISO codes, but checkout API requires Alpha-3 */

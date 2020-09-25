@@ -4,6 +4,7 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { AddressRules } from 'vtex.address-form'
 import { Spinner } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
+
 import address from '../graphql/GetOrderForm.graphql'
 import Logistics from '../graphql/Logistics.graphql'
 import LocationForm from './LocationForm'

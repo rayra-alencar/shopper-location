@@ -6,6 +6,9 @@
   "store/shopper-location.change-location.error-permission": "Failed to find your location. Please check that you have granted permission for this site to use your location.",
   "store/shopper-location.change-location.submit": "SAVE",
   "store/shopper-location.redirect-toast.message": "Switch to the {country} site, if you would like to view the {country} specific site and products.",
+  "store/shopper-location.change-location.street": "Street address or P.O. Box",
+  "store/shopper-location.change-location.street-placeholder": "Eg: 225 East 41st Street, New York",
+  "store/shopper-location.change-location.apartment": "Apartment, suite, building, floor, etc (optional)",
 
   "store/shopper-location.countries.ABW": "Aruba",
   "store/shopper-location.countries.AFG": "Afghanistan",

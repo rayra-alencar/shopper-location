@@ -265,8 +265,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     const combinedAddress = { ...curAddress, ...newAddress }
     const validatedAddress = validateAddress(combinedAddress, rules)
 
-    console.log(combinedAddress, validatedAddress)
-    
     geoTimeout = setTimeout(() => {
       getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
         if (res?.length && isMountedRef.current) {
@@ -359,12 +357,17 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 Input={StyleguideInput}
                 address={location}
                 shipsTo={shipCountries}
+                onChangeAddress=""
               />
             </div>
             <div className="pb5">
               <Input
-                placeholder="Eg: 225 East 41st Street, New York"
-                label="Street address or P.O. Box"
+                placeholder={intl.formatMessage({
+                  id: 'store/shopper-location.change-location.street-placeholder',
+                })}
+                label={intl.formatMessage({
+                  id: 'store/shopper-location.change-location.street',
+                })}
                 onChange={(newAddress: AddressFormFields) =>
                   handleAddressChange(newAddress)
                 }
@@ -372,8 +375,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             </div>
             <div className="pb5">
               <Input
-                placeholder="Apartment, suite, building, floor, etc (optional)"
-                label="Apartment, suite, building, floor, etc (optional)"
+                placeholder={intl.formatMessage({
+                  id: 'store/shopper-location.change-location.apartment',
+                })}
+                label={intl.formatMessage({
+                  id: 'store/shopper-location.change-location.apartment',
+                })}
               />
             </div>
             <div className="pb5 flex nh2">

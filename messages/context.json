@@ -5,6 +5,9 @@
   "store/shopper-location.change-location.error-country": "store/shopper-location.change-location.error-country",
   "store/shopper-location.change-location.error-permission": "store/shopper-location.change-location.error-permission",
   "store/shopper-location.change-location.submit": "store/shopper-location.change-location.submit",
+  "store/shopper-location.change-location.street": "store/shopper-location.change-location.street",
+  "store/shopper-location.change-location.street-placeholder": "store/shopper-location.change-location.street-placeholder",
+  "store/shopper-location.change-location.apartment": "store/shopper-location.change-location.apartment",
 
   "store/shopper-location.countries.ABW": "store/shopper-location.countries.ABW",
   "store/shopper-location.countries.AFG": "store/shopper-location.countries.AFG",

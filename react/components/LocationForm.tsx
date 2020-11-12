@@ -5,14 +5,11 @@ import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
 import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
 import {
-  AddressContainer,
-  AddressForm as AddressFields,
   CountrySelector,
-  inputs,
   helpers,
-  PostalCodeGetter,
+  inputs
 } from 'vtex.address-form'
-import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
+import { Button, ButtonWithIcon, IconLocation, Input, Dropdown } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
 import { useDevice } from 'vtex.device-detector'
 
@@ -22,6 +19,7 @@ import { getParsedAddress } from '../helpers/getParsedAddress'
 import updateOrderFormShipping from '../graphql/UpdateOrderFormShipping.graphql'
 
 const { StyleguideInput } = inputs
+
 const {
   addValidation,
   removeValidation,
@@ -57,6 +55,7 @@ const geolocationOptions = {
   maximumAge: 30000,
   timeout: 10000,
 }
+
 
 const getGeolocation = async (key: string, address: any) => {
   const query = encodeURIComponent(
@@ -116,6 +115,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
+
 
   useEffect(() => {
     isMountedRef.current = true
@@ -265,6 +265,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     const combinedAddress = { ...curAddress, ...newAddress }
     const validatedAddress = validateAddress(combinedAddress, rules)
 
+    console.log(combinedAddress, validatedAddress)
+    
     geoTimeout = setTimeout(() => {
       getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
         if (res?.length && isMountedRef.current) {
@@ -308,16 +310,19 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       value: code,
     }))
   }
-
   const shipCountries = translateCountries()
+  
+  const _states_options = [
+    { value: 'op1', label: 'op1' },
+    { value: 'op2', label: 'op2' }
+  ]
 
   return (
     <div
-      className={`${handles.changeLocationContainer} w-100`}
-      style={!isMobile ? { minWidth: 800 } : {}}
+      className={`${handles.changeLocationContainer} w-100 nb6-ns`}
     >
-      <div className="flex flex-auto">
-        <div className="mr5">
+      <div className="nh8-ns nv6-ns flex flex-auto">
+        <div className="pa6">
           <section className={handles.changeLocationGeoContainer}>
             {countryError ? (
               <div
@@ -346,37 +351,55 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
-            <AddressContainer
-              address={location}
-              Input={StyleguideInput}
-              rules={rules}
-              onChangeAddress={(newAddress: AddressFormFields) =>
-                handleAddressChange(newAddress)
-              }
-              autoCompletePostalCode={false}
+            
+            <div 
+              className={` ${shipCountries.length==1 ? "hide" : ""} shopper-location-ship-country`}
             >
-              <CountrySelector shipsTo={shipCountries} />
-              <AddressFields
-                address={location}
+              <CountrySelector
                 Input={StyleguideInput}
-                omitAutoCompletedFields={false}
-                omitPostalCodeFields
-                onChangeAddress={(newAddress: AddressFormFields) =>
-                  handleAddressChange(newAddress)
-                }
-                notApplicableLabel={intl.formatMessage({
-                  id:
-                    'store/shopper-location.change-location.addressNotApplicable',
-                })}
+                address={location}
+                shipsTo={shipCountries}
               />
-              <PostalCodeGetter
-                address={location}
-                Input={StyleguideInput}
-                onChangeAddress={(newAddress: AddressFormFields) =>
+            </div>
+            <div className="pb5">
+              <Input
+                placeholder="Eg: 225 East 41st Street, New York"
+                label="Street address or P.O. Box"
+                onChange={(newAddress: AddressFormFields) =>
                   handleAddressChange(newAddress)
                 }
               />
-            </AddressContainer>
+            </div>
+            <div className="pb5">
+              <Input
+                placeholder="Apartment, suite, building, floor, etc (optional)"
+                label="Apartment, suite, building, floor, etc (optional)"
+              />
+            </div>
+            <div className="pb5 flex nh2">
+              <div
+                className={`w-50 mh2`}
+              >
+                <Input
+                  placeholder="City"
+                  label="City"
+                />
+              </div>
+              <div
+                className={`w-50 mh2`}
+              >
+                <Dropdown
+                  label="State"
+                  options={_states_options}
+                />
+              </div>
+            </div>
+            <div className="">
+              <Input
+                placeholder=""
+                label="Postal Code"
+              />
+            </div>
           </section>
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button

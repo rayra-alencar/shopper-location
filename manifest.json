@@ -27,6 +27,31 @@
         "title": "IP Geolocation Service API Key",
         "description": "Enter your API key for https://ip-geolocation.whoisxmlapi.com",
         "type": "string"
+      },
+      "redirects": {
+        "title": "Locale Redirect",
+        "description": "Redirect requests based off user location",
+        "type": "array",
+        "items": {
+          "default": [],
+          "type": "object",
+          "properties": {
+            "country": {
+              "title": "Alpha-3 Country Code",
+              "type": "string"
+            },
+            "url": {
+              "title": "URL",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "automaticRedirect": {
+        "title": "Automatic Redirect",
+        "description": "Redirect user to their country site without displaying a redirect message and option",
+        "type": "boolean",
+        "default": false
       }
     }
   },

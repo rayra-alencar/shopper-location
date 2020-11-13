@@ -4,12 +4,8 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
 import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
-import {
-  CountrySelector,
-  helpers,
-  inputs
-} from 'vtex.address-form'
-import { Button, ButtonWithIcon, IconLocation, Input, Dropdown } from 'vtex.styleguide'
+import { CountrySelector, helpers, inputs } from 'vtex.address-form'
+import { Button, ButtonWithIcon, IconLocation, Input } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
 import { useDevice } from 'vtex.device-detector'
 
@@ -55,7 +51,6 @@ const geolocationOptions = {
   maximumAge: 30000,
   timeout: 10000,
 }
-
 
 const getGeolocation = async (key: string, address: any) => {
   const query = encodeURIComponent(
@@ -115,7 +110,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
-
 
   useEffect(() => {
     isMountedRef.current = true
@@ -308,19 +302,13 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       value: code,
     }))
   }
+
   const shipCountries = translateCountries()
-  
-  const _states_options = [
-    { value: 'op1', label: 'op1' },
-    { value: 'op2', label: 'op2' }
-  ]
 
   return (
-    <div
-      className={`${handles.changeLocationContainer} w-100 nb6-ns`}
-    >
+    <div className={`${handles.changeLocationContainer} w-100 nb6-ns`}>
       <div className="nh8-ns nv6-ns flex flex-auto">
-        <div className="pa6">
+        <div className="pa6 w-50">
           <section className={handles.changeLocationGeoContainer}>
             {countryError ? (
               <div
@@ -349,9 +337,10 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
-            
-            <div 
-              className={` ${shipCountries.length==1 ? "hide" : ""} shopper-location-ship-country`}
+            <div
+              className={` ${
+                shipCountries.length === 1 ? 'hide' : ''
+              } shopper-location-ship-country`}
             >
               <CountrySelector
                 Input={StyleguideInput}
@@ -363,11 +352,14 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
             <div className="pb5">
               <Input
                 placeholder={intl.formatMessage({
-                  id: 'store/shopper-location.change-location.street-placeholder',
+                  id:
+                    'store/shopper-location.change-location.street-placeholder',
                 })}
                 label={intl.formatMessage({
                   id: 'store/shopper-location.change-location.street',
                 })}
+                id="vtex-shopper-location-input-street"
+                value={location.street.value}
                 onChange={(newAddress: AddressFormFields) =>
                   handleAddressChange(newAddress)
                 }
@@ -384,27 +376,36 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
               />
             </div>
             <div className="pb5 flex nh2">
-              <div
-                className={`w-50 mh2`}
-              >
+              <div className="w-50 mh2">
                 <Input
-                  placeholder="City"
-                  label="City"
+                  placeholder={intl.formatMessage({
+                    id: 'store/shopper-location.change-location.city',
+                  })}
+                  label={intl.formatMessage({
+                    id: 'store/shopper-location.change-location.city',
+                  })}
+                  value={location.city.value}
                 />
               </div>
-              <div
-                className={`w-50 mh2`}
-              >
-                <Dropdown
-                  label="State"
-                  options={_states_options}
+              <div className="w-50 mh2">
+                <Input
+                  placeholder={intl.formatMessage({
+                    id: 'store/shopper-location.change-location.state',
+                  })}
+                  label={intl.formatMessage({
+                    id: 'store/shopper-location.change-location.state',
+                  })}
+                  value={location.state.value}
                 />
               </div>
             </div>
             <div className="">
               <Input
                 placeholder=""
-                label="Postal Code"
+                label={intl.formatMessage({
+                  id: 'store/shopper-location.change-location.postalCode',
+                })}
+                value={location.postalCode.value}
               />
             </div>
           </section>
@@ -421,7 +422,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           </section>
         </div>
         {!isMobile && (
-          <div className="flex-grow-1 relative">
+          <div className="flex-grow-1 relative w-50">
             <MapContainer
               geoCoordinates={location.geoCoordinates.value}
               googleMapsApiKey={googleMapsKey}

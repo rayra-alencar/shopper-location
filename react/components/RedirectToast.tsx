@@ -27,7 +27,9 @@ const RedirectToast: FunctionComponent<RedirectToastProps> = ({
   const settings = JSON.parse(appSettings.message) as Settings
   const { redirects } = settings
 
-  if (redirects && !redirectTo) {
+  if (!redirects) return null
+
+  if (!redirectTo) {
     const countryRedirect = redirects.find(
       redirect => redirect.country === orderForm.shippingData.address.country
     )

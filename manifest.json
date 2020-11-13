@@ -16,6 +16,7 @@
     "vtex.device-detector": "0.x",
     "vtex.modal-layout": "0.x",
     "vtex.address-form": "4.x",
+    "vtex.address-locator": "2.x",
     "vtex.css-handles": "0.x",
     "vtex.styleguide": "9.x"
   },

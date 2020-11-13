@@ -8,6 +8,9 @@
   "store/shopper-location.change-location.street": "store/shopper-location.change-location.street",
   "store/shopper-location.change-location.street-placeholder": "store/shopper-location.change-location.street-placeholder",
   "store/shopper-location.change-location.apartment": "store/shopper-location.change-location.apartment",
+  "store/shopper-location.change-location.postalCode": "store/shopper-location.change-location.postalCode",
+  "store/shopper-location.change-location.state": "store/shopper-location.change-location.state",
+  "store/shopper-location.change-location.city": "store/shopper-location.change-location.city",
 
   "store/shopper-location.countries.ABW": "store/shopper-location.countries.ABW",
   "store/shopper-location.countries.AFG": "store/shopper-location.countries.AFG",

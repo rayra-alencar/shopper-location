@@ -3,15 +3,17 @@ import React, {
   useState,
   useCallback,
   FunctionComponent,
-  Fragment,
 } from 'react'
 import { useQuery, useMutation } from 'react-apollo'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { ToastProvider } from 'vtex.styleguide'
 
 import { getParsedAddress } from './helpers/getParsedAddress'
 import Address from './graphql/GetOrderForm.graphql'
 import Logistics from './graphql/Logistics.graphql'
 import UpdateOrderFormShipping from './graphql/UpdateOrderFormShipping.graphql'
 import AppSettings from './graphql/AppSettings.graphql'
+import RedirectToast from './components/RedirectToast'
 
 const geolocationOptions = {
   enableHighAccuracy: true,
@@ -19,11 +21,14 @@ const geolocationOptions = {
   timeout: 10000,
 }
 
-const AddressChallenge: FunctionComponent = ({ children }) => {
+const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
+  children,
+  intl,
+}) => {
   const [updateAddress] = useMutation(UpdateOrderFormShipping)
   const { loading, data, refetch } = useQuery(Address, { ssr: false })
   const { data: logisticsData } = useQuery(Logistics, { ssr: false })
-  const { data: appSettingsData } = useQuery(AppSettings, {
+  const { data: appSettingsData } = useQuery<AppSettingsData>(AppSettings, {
     variables: {
       version: process.env.VTEX_APP_VERSION,
     },
@@ -89,14 +94,14 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
   )
 
   const handleError = useCallback(() => {
-    const { geolocationApiKey } = JSON.parse(
-      appSettingsData?.appSettings?.message
-    )
+    const settings =
+      appSettingsData &&
+      (JSON.parse(appSettingsData.appSettings.message) as Settings)
 
-    if (!geolocationApiKey) return
+    if (!settings?.geolocationApiKey) return
     // get geolocation from user IP
     fetch(
-      `https://ip-geolocation.whoisxmlapi.com/api/v1?apiKey=${geolocationApiKey}`
+      `https://ip-geolocation.whoisxmlapi.com/api/v1?apiKey=${settings.geolocationApiKey}`
     )
       .then(res => res.json())
       .then(async res => {
@@ -134,12 +139,7 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
             window.dispatchEvent(event)
           })
       })
-  }, [
-    appSettingsData?.appSettings?.message,
-    data?.orderForm,
-    requestGoogleMapsApi,
-    updateAddress,
-  ])
+  }, [appSettingsData, data?.orderForm, requestGoogleMapsApi, updateAddress])
 
   useEffect(() => {
     const handleLocationUpdated = () => refetch()
@@ -168,7 +168,16 @@ const AddressChallenge: FunctionComponent = ({ children }) => {
 
   if (!renderChildren) return null
 
-  return <Fragment>{children}</Fragment>
+  return (
+    <ToastProvider positioning="window">
+      {children}
+      <RedirectToast
+        intl={intl}
+        orderForm={data.orderForm}
+        appSettings={appSettingsData?.appSettings}
+      />
+    </ToastProvider>
+  )
 }
 
-export default AddressChallenge
+export default injectIntl(AddressChallenge)

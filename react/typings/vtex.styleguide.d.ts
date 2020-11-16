@@ -10,6 +10,8 @@ declare module 'vtex.styleguide' {
   export const Spinner: ComponentType<Props>
   export const Dropdown: ComponentType<Props>
   export const Checkbox: ComponentType<Props>
+  export const ToastConsumer: ComponentType<Props>
+  export const ToastProvider: ComponentType<Props>
   export const Toggle: ComponentType<Props>
   export const Divider: ComponentType<Props>
   export const IconCheck: ComponentType<Props>

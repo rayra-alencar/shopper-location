@@ -20,7 +20,7 @@ A block is also provided which renders a form allowing the user to manually chan
 
 2. In your account's admin dashboard, go to `Apps > My Apps` and click the Settings button for Shopper Location.
 
-3. Enter your API key for https://ip-geolocation.whoisxmlapi.com in the provided field and click Save.
+3. Enter your API key for https://ip-geolocation.whoisxmlapi.com in the provided field and click Save. If you plan to use the `Client Redirect` feature, it is also configured here.
 
 4. Modify your `store-theme` as follows:
 
@@ -97,6 +97,14 @@ A block is also provided which renders a form allowing the user to manually chan
     ]
   },
 ```
+
+### Client Redirect
+
+You have the option to redirect the user to a country specific URL, based on the user's location. In the App Settings, enter the [alpha-3 country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements) and URL for each supported country.
+
+On their first visit, if a user is not on their country's website, they will be given the option to be redirected to their country specific website. For users located in a country that does not have an entry in the App Settings, no option is displayed.
+
+Additionally, there is an `Automatic Redirect` option, that will redirect the user automatically, without displaying the option.
 
 ## Customization
 

@@ -35,6 +35,14 @@ export const getParsedAddress = (place: {
   const latitude = typeof lat === 'function' ? lat() : lat
   const longitude = typeof lng === 'function' ? lng() : lng
 
+  const street = parsedAddressComponents.route
+    ? `${
+        parsedAddressComponents.street_number
+          ? `${parsedAddressComponents.street_number} `
+          : ''
+      }${parsedAddressComponents.route}`
+    : ''
+
   const address = {
     addressType: 'residential',
     city:
@@ -46,14 +54,10 @@ export const getParsedAddress = (place: {
     country: getCountryISO3(parsedAddressComponents.country),
     neighborhood: parsedAddressComponents.sublocality_level_1,
     number: parsedAddressComponents.street_number || '',
-    postalCode: parsedAddressComponents.postal_code,
+    postalCode: parsedAddressComponents.postal_code || '',
     receiverName: '',
     state: parsedAddressComponents.administrative_area_level_1,
-    street: `${
-      parsedAddressComponents.street_number
-        ? `${parsedAddressComponents.street_number} `
-        : ''
-    }${parsedAddressComponents.route}`,
+    street,
     geoCoordinates: latitude && longitude ? [longitude, latitude] : null,
   }
 

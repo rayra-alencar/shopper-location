@@ -114,6 +114,7 @@ In order to apply CSS customizations in this and other blocks, follow the instru
 | --------------------------------- |
 | `changeLocationAddressContainer`  |
 | `changeLocationContainer`         |
+| `changeLocationFormContainer`     |
 | `changeLocationGeoContainer`      |
 | `changeLocationGeoErrorContainer` |
 | `changeLocationGeolocationButton` |

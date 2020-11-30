@@ -5,13 +5,15 @@ import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
 import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
 import { CountrySelector, helpers, inputs } from 'vtex.address-form'
-import { Button, ButtonWithIcon, IconLocation, Input } from 'vtex.styleguide'
+import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
 import { useCssHandles } from 'vtex.css-handles'
 import { useDevice } from 'vtex.device-detector'
 
+import AddressInput from './AddressInput'
 import MapContainer from './Map'
 import { useLocationState, useLocationDispatch } from './LocationContext'
 import { getParsedAddress } from '../helpers/getParsedAddress'
+import { countries } from '../messages/countries'
 import updateOrderFormShipping from '../graphql/UpdateOrderFormShipping.graphql'
 
 const { StyleguideInput } = inputs
@@ -37,6 +39,7 @@ interface AddressProps {
 
 const CSS_HANDLES = [
   'changeLocationContainer',
+  'changeLocationFormContainer',
   'changeLocationTitle',
   'changeLocationAddressContainer',
   'changeLocationGeoContainer',
@@ -113,6 +116,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
   useEffect(() => {
     isMountedRef.current = true
+    currentAddress.receiverName = currentAddress.receiverName || { value: ' ' }
     const addressWithValidation = addValidation(currentAddress)
 
     if (isMountedRef.current) {
@@ -128,6 +132,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       isMountedRef.current = false
     }
   }, [])
+
+  useEffect(() => {
+    if (location.country.value && rules.country) {
+      resetAddressRules()
+    }
+  }, [rules])
 
   const requestGoogleMapsApi = async (params: {
     lat: number
@@ -187,7 +197,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       addressType: addressFields.addressType || '',
       geoCoordinates: addressFields.geoCoordinates ?? [],
       state: addressFields.state || '',
-      receiverName: location.receiverName.value ?? '',
+      receiverName: location.receiverName.value ?? ' ',
       reference: '',
       country: addressFields.country || '',
     }
@@ -253,7 +263,48 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       })
   }
 
-  function handleAddressChange(newAddress: AddressFormFields) {
+  function resetAddressRules() {
+    const hiddenFields = rules.fields
+      .filter(
+        (f: any) =>
+          f.hidden === true &&
+          f.name !== 'postalCode' &&
+          f.name !== 'country' &&
+          f.name !== 'receiverName'
+      )
+      .map((i: any) => i.name)
+
+    const addressFields = Object.keys(location)
+      .filter((key: any) => !hiddenFields.includes(key))
+      .reduce((obj: any, key: any) => {
+        obj[key] = location[key]
+
+        return obj
+      }, {})
+
+    const address = addValidation(addressFields, rules)
+
+    locationDispatch({
+      type: 'SET_LOCATION',
+      args: {
+        address,
+      },
+    })
+  }
+
+  function handleCountryChange(newAddress: any) {
+    const curAddress = location
+    const combinedAddress = { ...curAddress, ...newAddress }
+
+    locationDispatch({
+      type: 'SET_LOCATION',
+      args: {
+        address: combinedAddress,
+      },
+    })
+  }
+
+  function handleAddressChange(newAddress: any) {
     clearTimeout(geoTimeout)
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
@@ -296,9 +347,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     }
 
     return shipsTo.map((code: string) => ({
-      label: intl.formatMessage({
-        id: `store/shopper-location.countries.${code}`,
-      }),
+      label: intl.formatMessage(countries[code as keyof typeof countries]),
       value: code,
     }))
   }
@@ -306,9 +355,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const shipCountries = translateCountries()
 
   return (
-    <div className={`${handles.changeLocationContainer} w-100 nb6-ns`}>
-      <div className="nh8-ns nv6-ns flex flex-auto">
-        <div className="pa6 w-50">
+    <div
+      className={`${handles.changeLocationContainer} w-100`}
+      style={!isMobile ? { width: 800 } : {}}
+    >
+      <div className="flex flex-auto">
+        <div className={`${handles.changeLocationFormContainer} pa6 w-100`}>
           <section className={handles.changeLocationGeoContainer}>
             {countryError ? (
               <div
@@ -346,67 +398,31 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 Input={StyleguideInput}
                 address={location}
                 shipsTo={shipCountries}
-                onChangeAddress=""
-              />
-            </div>
-            <div className="pb5">
-              <Input
-                placeholder={intl.formatMessage({
-                  id:
-                    'store/shopper-location.change-location.street-placeholder',
-                })}
-                label={intl.formatMessage({
-                  id: 'store/shopper-location.change-location.street',
-                })}
-                id="vtex-shopper-location-input-street"
-                value={location.street.value}
-                onChange={(newAddress: AddressFormFields) =>
-                  handleAddressChange(newAddress)
+                onChangeAddress={(newAddress: AddressFormFields) =>
+                  handleCountryChange({
+                    country: { value: newAddress.country.value },
+                    city: { value: '' },
+                    state: { value: '' },
+                    neighborhood: { value: '' },
+                    postalCode: { value: '' },
+                  })
                 }
               />
             </div>
-            <div className="pb5">
-              <Input
-                placeholder={intl.formatMessage({
-                  id: 'store/shopper-location.change-location.apartment',
+            <div className="flex flex-wrap">
+              {rules.fields
+                .sort((_a: any, b: any) => (b.name === 'postalCode' ? -1 : 1))
+                .map((field: any) => {
+                  return (
+                    <AddressInput
+                      key={field.name}
+                      intl={intl}
+                      field={field}
+                      location={location}
+                      handleAddressChange={handleAddressChange}
+                    />
+                  )
                 })}
-                label={intl.formatMessage({
-                  id: 'store/shopper-location.change-location.apartment',
-                })}
-              />
-            </div>
-            <div className="pb5 flex nh2">
-              <div className="w-50 mh2">
-                <Input
-                  placeholder={intl.formatMessage({
-                    id: 'store/shopper-location.change-location.city',
-                  })}
-                  label={intl.formatMessage({
-                    id: 'store/shopper-location.change-location.city',
-                  })}
-                  value={location.city.value}
-                />
-              </div>
-              <div className="w-50 mh2">
-                <Input
-                  placeholder={intl.formatMessage({
-                    id: 'store/shopper-location.change-location.state',
-                  })}
-                  label={intl.formatMessage({
-                    id: 'store/shopper-location.change-location.state',
-                  })}
-                  value={location.state.value}
-                />
-              </div>
-            </div>
-            <div className="">
-              <Input
-                placeholder=""
-                label={intl.formatMessage({
-                  id: 'store/shopper-location.change-location.postalCode',
-                })}
-                value={location.postalCode.value}
-              />
             </div>
           </section>
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
@@ -422,7 +438,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           </section>
         </div>
         {!isMobile && (
-          <div className="flex-grow-1 relative w-50">
+          <div className="flex-grow-1 relative w-100">
             <MapContainer
               geoCoordinates={location.geoCoordinates.value}
               googleMapsApiKey={googleMapsKey}

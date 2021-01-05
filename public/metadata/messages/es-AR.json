@@ -1,0 +1,16 @@
+{
+  "name": "Ubicación del comprador",
+  "headline": "Establecer la dirección de envío según el navegador del usuario o la ubicación geográfica de IP.",
+  "overview": "Esta aplicación intenta determinar la ubicación del usuario si aún no la conoce, primero solicitando permiso para usar la función de geolocalización de su navegador y luego buscando su ubicación en la dirección de IP como alternativa. La ubicación se almacena en el sección shippingData del orderForm.",
+  "features": [
+    "Solicitud de permiso para obtener geolocalización",
+    "Respaldo para utilizar la geolocalización de IP",
+    "Admite varios países",
+    "Formulario de dirección según el país",
+    "Dirección configurada manualmente en el modal"
+  ],
+  "websiteURL": "https://vtex.com/",
+  "support": {
+    "url": "https://support.vtex.com/hc/requests"
+  }
+}

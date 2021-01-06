@@ -1,7 +1,7 @@
 {
   "name": "shopper-location",
   "vendor": "vtex",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "title": "Shopper Location",
   "description": "Determine location of shopper and store it in the orderForm",
   "builders": {
@@ -61,7 +61,9 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vtex.shopper-location"
     },
     "type": "free",
-    "availableCountries": ["*"]
+    "availableCountries": [
+      "*"
+    ]
   },
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

@@ -1,0 +1,16 @@
+{
+  "name": "Shopper Location",
+  "headline": "Set shipping address based on user browser's or IP Geolocation",
+  "overview": "This app attempts to determine the user's location if not already known, first by requesting permission to use their browser's geolocation feature, then by looking up their location based on their IP address as a fallback. The location is stored in the shippingData section of the orderForm.",
+  "features": [
+    "Permission request to get Geolocation",
+    "Fallback to use IP Geolocation",
+    "Support multiple countries",
+    "Address form according to the country",
+    "Manually set address in the modal"
+  ],
+  "websiteURL": "https://vtex.com/",
+  "support": {
+    "url": "https://support.vtex.com/hc/requests"
+  }
+}

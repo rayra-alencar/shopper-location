@@ -1,0 +1,16 @@
+{
+  "name": "Shopper Location",
+  "headline": "Definir endereço de entrega com base no navegador do usuário ou localização do IP",
+  "overview": "Este aplicativo tenta determinar a localização do usuário, se ainda não for conhecida, primeiro solicitando permissão para usar o recurso de geolocalização do navegador e, em seguida, procurando sua localização com base no endereço IP como alternativa. A localização é armazenada no seção shippingData do orderForm.",
+  "features": [
+    "Solicitação de permissão para obter geolocalização",
+    "Fallback para usar geolocalização por IP",
+    "Suporte a vários países",
+    "Formulário de endereço de acordo com o país",
+    "Definir endereço manualmente no modal"
+  ],
+  "websiteURL": "https://vtex.com/",
+  "support": {
+    "url": "https://support.vtex.com/hc/requests"
+  }
+}

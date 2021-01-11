@@ -1,6 +1,6 @@
 {
   "name": "Shopper Location",
-  "headline": "Definir endereço de entrega com base no navegador do usuário ou localização do IP",
+  "headline": "Definir endereço de entrega com base no navegador do usuário ou localização do IP.",
   "overview": "Este aplicativo tenta determinar a localização do usuário, se ainda não for conhecida, primeiro solicitando permissão para usar o recurso de geolocalização do navegador e, em seguida, procurando sua localização com base no endereço IP como alternativa. A localização é armazenada no seção shippingData do orderForm.",
   "features": [
     "Solicitação de permissão para obter geolocalização",

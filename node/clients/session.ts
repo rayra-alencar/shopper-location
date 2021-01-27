@@ -4,7 +4,7 @@ import { ExternalClient } from '@vtex/api'
 
 export default class CustomSession extends ExternalClient {
   constructor(context: IOContext, options?: InstanceOptions) {
-    super('', context, {
+    super(`http://${context.account}.vtexcommercestable.com.br`, context, {
         ...options,
         headers: {
           'Proxy-Authorization': context.authToken,
@@ -17,6 +17,7 @@ export default class CustomSession extends ExternalClient {
     }
 
     public updateRegionId = (body: any) => {
+      console.log(this.context)
         return this.http.postRaw(
           `/api/sessions`, body
         )

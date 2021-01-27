@@ -1,0 +1,6 @@
+mutation updateRegionId($public: RegionData!) {
+  updateRegionId(public: $public) @context(provider: "vtex.shopper-location") {
+    sessionToken
+    segmentToken
+  }
+}

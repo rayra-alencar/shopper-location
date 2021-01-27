@@ -14,6 +14,7 @@ import MapContainer from './Map'
 import { useLocationState, useLocationDispatch } from './LocationContext'
 import { getParsedAddress } from '../helpers/getParsedAddress'
 import { countries } from '../messages/countries'
+import UPDATE_REGION_ID from '../graphql/UpdateRegionId.graphql'
 import updateOrderFormShipping from '../graphql/UpdateOrderFormShipping.graphql'
 
 const { StyleguideInput } = inputs
@@ -22,7 +23,7 @@ const {
   addValidation,
   removeValidation,
   injectRules,
-  isValidAddress,
+  // isValidAddress,
   validateAddress,
 } = helpers
 
@@ -34,7 +35,7 @@ interface AddressProps {
   currentAddress: AddressFormFields
   shipsTo: string[]
   googleMapsKey: string
-  orderFormId: string
+  orderForm: any
 }
 
 const CSS_HANDLES = [
@@ -99,7 +100,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   rules,
   currentAddress,
   shipsTo,
-  orderFormId,
+  orderForm,
   googleMapsKey,
 }) => {
   const dispatch = useModalDispatch()
@@ -113,6 +114,11 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
+  const [regionId, setRegionId] = useState<any | null>(null)
+  const [
+    sendPostalCode,
+    { data: regionIdData, error: errorRegionIdData },
+  ] = useMutation(UPDATE_REGION_ID)
 
   useEffect(() => {
     isMountedRef.current = true
@@ -238,7 +244,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
     updateAddress({
       variables: {
-        orderFormId,
+        orderFormId: orderForm.orderFormId,
         address: {
           addressType: 'residential',
           street: newAddress.street,
@@ -304,6 +310,20 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     })
   }
 
+  const getRegionID = async () => {
+    const { country, postalCode } = removeValidation(location)
+
+    console.log('getRegionId')
+
+    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${2}`
+    const response = await fetch(regionsAPI)
+    const data = await response.json()
+
+    console.log('getRegionId Response', data)
+    console.log('location', location)
+    setRegionId(data)
+  }
+
   function handleAddressChange(newAddress: any) {
     clearTimeout(geoTimeout)
     const curAddress = location
@@ -354,6 +374,37 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
   const shipCountries = translateCountries()
 
+  const updateRegionId = (id: string) => {
+    console.log('Update session with regionId:', id)
+
+    return sendPostalCode({
+      variables: {
+        public: {
+          regionId: {
+            value: btoa(`SW#${id}`),
+          },
+        },
+      },
+    })
+  }
+
+  useEffect(() => {
+    if (!regionId || !regionId?.[0]?.sellers?.[0]?.id) {
+      return
+    }
+
+    updateRegionId(regionId[0].sellers[0].id)
+  }, [regionId])
+
+  useEffect(() => {
+    if (regionIdData) {
+      console.log('session response', regionIdData)
+      window.location.reload()
+    } else {
+      console.log('session response error', errorRegionIdData)
+    }
+  }, [regionIdData])
+
   return (
     <div
       className={`${handles.changeLocationContainer} w-100`}
@@ -377,15 +428,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
-              <ButtonWithIcon
-                variation="primary"
-                icon={<IconLocation />}
-                onClick={() => handleGeolocation()}
-                class={handles.changeLocationGeolocationButton}
-                isLoading={geoLoading}
-              >
-                <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-              </ButtonWithIcon>
+              <div>
+                <ButtonWithIcon
+                  variation="primary"
+                  icon={<IconLocation />}
+                  onClick={() => handleGeolocation()}
+                  class={handles.changeLocationGeolocationButton}
+                  isLoading={geoLoading}
+                >
+                  <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
+                </ButtonWithIcon>
+                <ButtonWithIcon
+                  variation="primary"
+                  icon={<IconLocation />}
+                  onClick={() => getRegionID()}
+                  class={handles.changeLocationGeolocationButton}
+                  isLoading={geoLoading}
+                >
+                  Update RegionId
+                </ButtonWithIcon>
+              </div>
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
@@ -428,7 +490,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button
               variation="primary"
-              disabled={!location || !isValidAddress(location, rules).valid}
+              // disabled={!location || !isValidAddress(location, rules).valid}
               onClick={() => handleUpdateAddress()}
               class={handles.changeLocationSubmitButton}
               isLoading={locationLoading}

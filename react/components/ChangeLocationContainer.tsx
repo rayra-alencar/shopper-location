@@ -58,7 +58,7 @@ const ChangeLocation: FunctionComponent<WrappedComponentProps> = ({ intl }) => {
       useGeolocation={false}
     >
       <LocationForm
-        orderFormId={data.orderForm?.orderFormId}
+        orderForm={data.orderForm || null}
         currentAddress={currentAddress}
         shipsTo={logisticsData.logistics?.shipsTo || []}
         googleMapsKey={logisticsData.logistics?.googleMapsKey || ''}

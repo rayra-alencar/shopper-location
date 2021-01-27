@@ -1,0 +1,20 @@
+type Mutation {
+  updateRegionId(public: RegionData!): SessionResponse
+}
+
+input RegionData {
+  regionId: RegionValue!
+}
+
+input RegionValue {
+  value: String!
+}
+
+type SessionResponse {
+  sessionToken: String
+  segmentToken: String
+}
+
+type Query {
+  val: String
+}

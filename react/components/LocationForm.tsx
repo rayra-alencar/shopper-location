@@ -23,7 +23,7 @@ const {
   addValidation,
   removeValidation,
   injectRules,
-  // isValidAddress,
+  isValidAddress,
   validateAddress,
 } = helpers
 
@@ -445,7 +445,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
             <div
               className={` ${
-                shipCountries.length === 1 ? 'hide' : ''
+                shipCountries.length === 1 ? 'dn' : ''
               } shopper-location-ship-country`}
             >
               <CountrySelector
@@ -482,7 +482,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button
               variation="primary"
-              // disabled={!location || !isValidAddress(location, rules).valid}
+              disabled={!location || !isValidAddress(location, rules).valid}
               onClick={() => handleUpdateAddress()}
               class={handles.changeLocationSubmitButton}
               isLoading={locationLoading}

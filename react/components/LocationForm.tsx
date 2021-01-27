@@ -238,9 +238,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     )
   }
 
+  const getRegionID = async () => {
+    const { country, postalCode } = removeValidation(location)
+
+    console.log('getRegionId')
+    console.log('orderForm.salesChannel', orderForm.salesChannel)
+
+    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${orderForm.salesChannel}`
+    const response = await fetch(regionsAPI)
+    const data = await response.json()
+
+    console.log('getRegionId Response', data)
+    console.log('location', location)
+    setRegionId(data)
+  }
+
   const handleUpdateAddress = () => {
     setLocationLoading(true)
     const newAddress = removeValidation(location)
+
+    getRegionID()
 
     updateAddress({
       variables: {
@@ -308,20 +325,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         address: combinedAddress,
       },
     })
-  }
-
-  const getRegionID = async () => {
-    const { country, postalCode } = removeValidation(location)
-
-    console.log('getRegionId')
-
-    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${orderForm.salesChannel}`
-    const response = await fetch(regionsAPI)
-    const data = await response.json()
-
-    console.log('getRegionId Response', data)
-    console.log('location', location)
-    setRegionId(data)
   }
 
   function handleAddressChange(newAddress: any) {
@@ -428,26 +431,15 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
-              <div>
-                <ButtonWithIcon
-                  variation="primary"
-                  icon={<IconLocation />}
-                  onClick={() => handleGeolocation()}
-                  class={handles.changeLocationGeolocationButton}
-                  isLoading={geoLoading}
-                >
-                  <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-                </ButtonWithIcon>
-                <ButtonWithIcon
-                  variation="primary"
-                  icon={<IconLocation />}
-                  onClick={() => getRegionID()}
-                  class={handles.changeLocationGeolocationButton}
-                  isLoading={geoLoading}
-                >
-                  Update RegionId
-                </ButtonWithIcon>
-              </div>
+              <ButtonWithIcon
+                variation="primary"
+                icon={<IconLocation />}
+                onClick={() => handleGeolocation()}
+                class={handles.changeLocationGeolocationButton}
+                isLoading={geoLoading}
+              >
+                <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
+              </ButtonWithIcon>
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>

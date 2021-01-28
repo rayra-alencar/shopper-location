@@ -244,7 +244,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     console.log('getRegionId')
     console.log('orderForm.salesChannel', orderForm.salesChannel)
 
-    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${2}`
+    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${orderForm.salesChannel}`
     const response = await fetch(regionsAPI)
     const data = await response.json()
 

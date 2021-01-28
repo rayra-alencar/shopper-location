@@ -244,7 +244,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     console.log('getRegionId')
     console.log('orderForm.salesChannel', orderForm.salesChannel)
 
-    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${orderForm.salesChannel}`
+    const regionsAPI = `/api/checkout/pub/regions?country=${country}&postalCode=${postalCode}&sc=${2}`
     const response = await fetch(regionsAPI)
     const data = await response.json()
 
@@ -380,7 +380,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const updateRegionId = (id: string) => {
     console.log('Update session with regionId:', id)
 
-    return sendPostalCode({
+    sendPostalCode({
       variables: {
         public: {
           regionId: {
@@ -389,6 +389,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         },
       },
     })
+    window.location.reload()
   }
 
   useEffect(() => {
@@ -402,7 +403,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   useEffect(() => {
     if (regionIdData) {
       console.log('session response', regionIdData)
-      window.location.reload()
     } else {
       console.log('session response error', errorRegionIdData)
     }

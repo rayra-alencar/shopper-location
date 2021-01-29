@@ -63,7 +63,9 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vtex.shopper-location"
     },
     "type": "free",
-    "availableCountries": ["*"]
+    "availableCountries": [
+      "*"
+    ]
   },
   "policies": [
     {

@@ -396,8 +396,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     if (!regionId || !regionId?.[0]?.sellers?.[0]?.id) {
       return
     }
-
-    updateRegionId(regionId[0].sellers[0].id)
+    updateRegionId(regionId[0].sellers.map( (i:any) => i.id).join(","))
   }, [regionId])
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { defineMessages } from 'react-intl'
 
-export const countries = defineMessages({
+export const countries: any = defineMessages({
   ABW: { id: 'store/shopper-location.countries.ABW' },
   AFG: { id: 'store/shopper-location.countries.AFG' },
   AGO: { id: 'store/shopper-location.countries.AGO' },
@@ -13,6 +13,8 @@ export const countries = defineMessages({
   ARG: { id: 'store/shopper-location.countries.ARG' },
   ARM: { id: 'store/shopper-location.countries.ARM' },
   ASM: { id: 'store/shopper-location.countries.ASM' },
+  ATA: { id: 'store/shopper-location.countries.ATA' },
+  ATF: { id: 'store/shopper-location.countries.ATF' },
   ATG: { id: 'store/shopper-location.countries.ATG' },
   AUS: { id: 'store/shopper-location.countries.AUS' },
   AUT: { id: 'store/shopper-location.countries.AUT' },
@@ -36,6 +38,7 @@ export const countries = defineMessages({
   BRB: { id: 'store/shopper-location.countries.BRB' },
   BRN: { id: 'store/shopper-location.countries.BRN' },
   BTN: { id: 'store/shopper-location.countries.BTN' },
+  BVT: { id: 'store/shopper-location.countries.BVT' },
   BWA: { id: 'store/shopper-location.countries.BWA' },
   CAF: { id: 'store/shopper-location.countries.CAF' },
   CAN: { id: 'store/shopper-location.countries.CAN' },
@@ -96,6 +99,7 @@ export const countries = defineMessages({
   GUM: { id: 'store/shopper-location.countries.GUM' },
   GUY: { id: 'store/shopper-location.countries.GUY' },
   HKG: { id: 'store/shopper-location.countries.HKG' },
+  HMD: { id: 'store/shopper-location.countries.HMD' },
   HND: { id: 'store/shopper-location.countries.HND' },
   HRV: { id: 'store/shopper-location.countries.HRV' },
   HTI: { id: 'store/shopper-location.countries.HTI' },
@@ -193,6 +197,7 @@ export const countries = defineMessages({
   SDN: { id: 'store/shopper-location.countries.SDN' },
   SEN: { id: 'store/shopper-location.countries.SEN' },
   SGP: { id: 'store/shopper-location.countries.SGP' },
+  SGS: { id: 'store/shopper-location.countries.SGS' },
   SHN: { id: 'store/shopper-location.countries.SHN' },
   SJM: { id: 'store/shopper-location.countries.SJM' },
   SLB: { id: 'store/shopper-location.countries.SLB' },
@@ -229,6 +234,7 @@ export const countries = defineMessages({
   TZA: { id: 'store/shopper-location.countries.TZA' },
   UGA: { id: 'store/shopper-location.countries.UGA' },
   UKR: { id: 'store/shopper-location.countries.UKR' },
+  UMI: { id: 'store/shopper-location.countries.UMI' },
   URY: { id: 'store/shopper-location.countries.URY' },
   USA: { id: 'store/shopper-location.countries.USA' },
   UZB: { id: 'store/shopper-location.countries.UZB' },

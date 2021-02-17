@@ -1,17 +1,14 @@
 import React, { FunctionComponent, useState } from 'react'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { ToastConsumer } from 'vtex.styleguide'
-
+import { countries } from '../messages/countries'
 interface RedirectToastProps {
-  intl: any
   orderForm: any
   appSettings?: SettingsData
 }
 
-const RedirectToast: FunctionComponent<RedirectToastProps> = ({
-  intl,
-  orderForm,
-  appSettings,
-}) => {
+const RedirectToast: FunctionComponent<RedirectToastProps &
+  WrappedComponentProps> = ({ intl, orderForm, appSettings }) => {
   const [redirectTo, setRedirectTo] = useState<string | null>(null)
   const hasCookie = document.cookie
     .split('; ')
@@ -52,9 +49,9 @@ const RedirectToast: FunctionComponent<RedirectToastProps> = ({
   }
 
   const toastMessage = () => {
-    const country = intl.formatMessage({
-      id: `store/shopper-location.countries.${orderForm.shippingData.address.country}`,
-    })
+    const country = intl.formatMessage(
+      countries[orderForm.shippingData?.address?.country ?? orderForm.storePreferencesData.countryCode]
+    )
 
     return intl.formatMessage(
       {
@@ -87,4 +84,4 @@ const RedirectToast: FunctionComponent<RedirectToastProps> = ({
   )
 }
 
-export default RedirectToast
+export default injectIntl(RedirectToast)

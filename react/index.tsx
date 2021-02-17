@@ -23,7 +23,6 @@ const geolocationOptions = {
 
 const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
   children,
-  intl,
 }) => {
   const [updateAddress] = useMutation(UpdateOrderFormShipping)
   const { loading, data, refetch } = useQuery(Address, { ssr: false })
@@ -172,7 +171,6 @@ const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
     <ToastProvider positioning="window">
       {children}
       <RedirectToast
-        intl={intl}
         orderForm={data.orderForm}
         appSettings={appSettingsData?.appSettings}
       />

@@ -345,11 +345,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     ) {
       shipsTo.push(location.country.value as string)
     }
-
-    return shipsTo.map((code: string) => ({
-      label: intl.formatMessage(countries[code as keyof typeof countries]),
-      value: code,
-    }))
+    return shipsTo.map((code: string) => {
+      return {
+        label: intl.formatMessage(countries[code as keyof typeof countries]),
+        value: code,
+      }
+    })
   }
 
   const shipCountries = translateCountries()

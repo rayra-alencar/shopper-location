@@ -20,9 +20,14 @@ declare global {
     redirects: Redirect[]
     automaticRedirect: boolean
   }
+
   interface Redirect {
     country: string
     url: string
+  }
+
+  interface ToastRenderProps {
+    showToast: (params: ShowToastParams) => void
   }
 }
 export {}

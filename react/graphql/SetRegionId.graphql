@@ -1,0 +1,13 @@
+mutation setRegionId(
+  $country: String!
+  $postalCode: String!
+  $salesChannel: String!
+) {
+  setRegionId(
+    country: $country
+    postalCode: $postalCode
+    salesChannel: $salesChannel
+  ) @context(provider: "vtex.shopper-location") {
+    updated
+  }
+}

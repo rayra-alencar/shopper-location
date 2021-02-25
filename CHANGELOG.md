@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- Update Region ID on address change
+
 ## [1.0.2] - 2021-02-17
 
 ### Fixed
@@ -20,11 +24,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.0.1] - 2021-01-11
 
 ### Fixed
+
 - metadata and screenshots to app store
 
 ## [1.0.0] - 2021-01-06
 
 ### Added
+
 - metadata to app store
 
 ## [0.2.1] - 2020-11-30

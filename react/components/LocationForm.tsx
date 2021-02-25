@@ -14,6 +14,7 @@ import MapContainer from './Map'
 import { useLocationState, useLocationDispatch } from './LocationContext'
 import { getParsedAddress } from '../helpers/getParsedAddress'
 import { countries } from '../messages/countries'
+import SET_REGION_ID from '../graphql/SetRegionId.graphql'
 import updateOrderFormShipping from '../graphql/UpdateOrderFormShipping.graphql'
 
 const { StyleguideInput } = inputs
@@ -34,7 +35,7 @@ interface AddressProps {
   currentAddress: AddressFormFields
   shipsTo: string[]
   googleMapsKey: string
-  orderFormId: string
+  orderForm: any
 }
 
 const CSS_HANDLES = [
@@ -99,10 +100,10 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   rules,
   currentAddress,
   shipsTo,
-  orderFormId,
+  orderForm,
   googleMapsKey,
 }) => {
-  const dispatch = useModalDispatch()
+  const dispatch: any = useModalDispatch()
   const { location } = useLocationState()
   const locationDispatch = useLocationDispatch()
   const [countryError, setCountryError] = useState(false)
@@ -110,9 +111,31 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const [locationLoading, setLocationLoading] = useState(false)
   const [geoLoading, setGeoLoading] = useState(false)
   const isMountedRef = useRef(false)
-  const [updateAddress] = useMutation(updateOrderFormShipping)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
+
+  const [
+    updateAddress,
+    { called: updateAddressCalled, loading: updateAddressLoading },
+  ] = useMutation(updateOrderFormShipping)
+
+  const [
+    setRegionId,
+    {
+      called: setRegionIdCalled,
+      loading: setRegionIdLoading,
+      data: regionData,
+    },
+  ] = useMutation(SET_REGION_ID)
+
+  const mutationsPending = () => {
+    return (
+      !updateAddressCalled ||
+      !setRegionIdCalled ||
+      updateAddressLoading ||
+      setRegionIdLoading
+    )
+  }
 
   useEffect(() => {
     isMountedRef.current = true
@@ -138,6 +161,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       resetAddressRules()
     }
   }, [rules])
+
+  useEffect(() => {
+    if (mutationsPending()) {
+      return
+    }
+
+    if (regionData?.setRegionId.updated) {
+      window.location.reload()
+    } else {
+      const event = new Event('locationUpdated')
+
+      window.dispatchEvent(event)
+      dispatch?.({ type: 'CLOSE_MODAL' })
+    }
+  }, [
+    updateAddressCalled,
+    setRegionIdCalled,
+    updateAddressLoading,
+    setRegionIdLoading,
+  ])
 
   const requestGoogleMapsApi = async (params: {
     lat: number
@@ -232,13 +275,27 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     )
   }
 
+  const updateRegionID = async () => {
+    const { country, postalCode } = removeValidation(location)
+    const { salesChannel } = orderForm
+
+    setRegionId({
+      variables: {
+        country,
+        postalCode,
+        salesChannel,
+      },
+    })
+  }
+
   const handleUpdateAddress = () => {
     setLocationLoading(true)
     const newAddress = removeValidation(location)
 
+    updateRegionID()
     updateAddress({
       variables: {
-        orderFormId,
+        orderFormId: orderForm.orderFormId,
         address: {
           addressType: 'residential',
           street: newAddress.street,
@@ -254,13 +311,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         },
       },
     })
-      .catch(() => null)
-      .then(() => {
-        const event = new Event('locationUpdated')
-
-        window.dispatchEvent(event)
-        dispatch?.({ type: 'CLOSE_MODAL' })
-      })
   }
 
   function resetAddressRules() {
@@ -345,6 +395,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     ) {
       shipsTo.push(location.country.value as string)
     }
+
     return shipsTo.map((code: string) => {
       return {
         label: intl.formatMessage(countries[code as keyof typeof countries]),
@@ -392,7 +443,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
             <div
               className={` ${
-                shipCountries.length === 1 ? 'hide' : ''
+                shipCountries.length === 1 ? 'dn' : ''
               } shopper-location-ship-country`}
             >
               <CountrySelector

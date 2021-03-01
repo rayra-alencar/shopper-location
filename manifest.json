@@ -7,8 +7,10 @@
   "builders": {
     "react": "3.x",
     "store": "0.x",
+    "node": "6.x",
     "messages": "1.x",
-    "docs": "0.x"
+    "docs": "0.x",
+    "graphql": "1.x"
   },
   "dependencies": {
     "vtex.store-graphql": "2.x",
@@ -61,9 +63,16 @@
       "url": "https://help-tickets.vtex.com/en/support?app=vtex.shopper-location"
     },
     "type": "free",
-    "availableCountries": [
-      "*"
-    ]
+    "availableCountries": ["*"]
   },
+  "policies": [
+    {
+      "attrs": {
+        "host": "portal.vtexcommercestable.com.br",
+        "path": "/api/*"
+      },
+      "name": "outbound-access"
+    }
+  ],
   "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
 }

@@ -1,7 +1,9 @@
 import React, { FunctionComponent, useState } from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { ToastConsumer } from 'vtex.styleguide'
+
 import { countries } from '../messages/countries'
+
 interface RedirectToastProps {
   orderForm: any
   appSettings?: SettingsData
@@ -50,7 +52,10 @@ const RedirectToast: FunctionComponent<RedirectToastProps &
 
   const toastMessage = () => {
     const country = intl.formatMessage(
-      countries[orderForm.shippingData?.address?.country ?? orderForm.storePreferencesData.countryCode]
+      countries[
+        orderForm.shippingData?.address?.country ??
+          orderForm.storePreferencesData.countryCode
+      ]
     )
 
     return intl.formatMessage(
@@ -65,7 +70,7 @@ const RedirectToast: FunctionComponent<RedirectToastProps &
 
   return (
     <ToastConsumer>
-      {(toast: any) => {
+      {(toast: ToastRenderProps) => {
         toast.showToast({
           message: toastMessage(),
           horizontalPosition: 'right',

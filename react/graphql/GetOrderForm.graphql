@@ -5,6 +5,7 @@ query address @context(provider: "vtex.store-graphql") {
     }
     cacheId
     orderFormId
+    salesChannel
     shippingData {
       address {
         neighborhood

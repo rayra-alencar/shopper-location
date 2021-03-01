@@ -50,15 +50,15 @@ const ChangeLocation: FunctionComponent<WrappedComponentProps> = ({ intl }) => {
   return (
     <AddressRules
       country={
-        location.country?.value ||
-        data.orderForm?.shippingData?.address?.country ||
+        (location.country?.value ??
+          data.orderForm?.shippingData?.address?.country) ||
         logisticsData.logistics?.shipsTo[0]
       }
       shouldUseIOFetching
       useGeolocation={false}
     >
       <LocationForm
-        orderFormId={data.orderForm?.orderFormId}
+        orderForm={data.orderForm || null}
         currentAddress={currentAddress}
         shipsTo={logisticsData.logistics?.shipsTo || []}
         googleMapsKey={logisticsData.logistics?.googleMapsKey || ''}

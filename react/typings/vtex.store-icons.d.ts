@@ -4,6 +4,6 @@ declare module 'vtex.store-icons' {
   export const IconLocationMarker: ComponentType<Props>
 
   interface Props {
-    [key: string]: any
+    [key: string]: unknown
   }
 }

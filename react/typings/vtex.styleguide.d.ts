@@ -20,6 +20,6 @@ declare module 'vtex.styleguide' {
   export const IconLocation: ComponentType<Props>
 
   interface Props {
-    [key: string]: any
+    [key: string]: unknown
   }
 }

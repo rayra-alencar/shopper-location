@@ -247,6 +247,7 @@ export const countries: any = defineMessages({
   VUT: { id: 'store/shopper-location.countries.VUT' },
   WLF: { id: 'store/shopper-location.countries.WLF' },
   WSM: { id: 'store/shopper-location.countries.WSM' },
+  XKX: { id: 'store/shopper-location.countries.XKX' },
   YEM: { id: 'store/shopper-location.countries.YEM' },
   ZAF: { id: 'store/shopper-location.countries.ZAF' },
   ZMB: { id: 'store/shopper-location.countries.ZMB' },

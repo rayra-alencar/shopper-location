@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.1] - 2021-03-02
+
 ### Fixed
 - When there's no mapped country, displays the country code instead
 

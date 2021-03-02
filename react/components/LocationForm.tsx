@@ -397,8 +397,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     }
 
     return shipsTo.map((code: string) => {
+      const countryCode = countries[code as keyof typeof countries]
       return {
-        label: intl.formatMessage(countries[code as keyof typeof countries]),
+        label: countryCode ? intl.formatMessage(countryCode) : code,
         value: code,
       }
     })

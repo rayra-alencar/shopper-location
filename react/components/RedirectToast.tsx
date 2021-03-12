@@ -19,7 +19,9 @@ const RedirectToast: FunctionComponent<RedirectToastProps &
   const setCookie = () =>
     (document.cookie = `VtexShopperLocation=1;path=/;max-age=7890000`)
 
-  if (!orderForm.shippingData?.address || !appSettings || hasCookie) {
+  const orderFormCountry = orderForm.shippingData?.address?.country
+
+  if (!orderFormCountry || !appSettings || hasCookie) {
     return null
   }
 
@@ -30,7 +32,8 @@ const RedirectToast: FunctionComponent<RedirectToastProps &
 
   if (!redirectTo) {
     const countryRedirect = redirects.find(
-      redirect => redirect.country === orderForm.shippingData.address.country
+      redirect =>
+        redirect.country.toUpperCase() === orderFormCountry.toUpperCase()
     )
 
     if (

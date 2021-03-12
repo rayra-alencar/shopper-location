@@ -12,7 +12,10 @@ This app attempts to determine the user's location if not already known, first b
 
 A block is also provided which renders a form allowing the user to manually change their location.
 
-:warning: You must have an API key for https://ip-geolocation.whoisxmlapi.com in order to use the IP lookup fallback method.
+Shopper Location also supports redirecting a user to a URL based off their location determined by the app. See the [Client Redirect](#client-redirect) section.
+
+:information_source: The Google Geolocation API key in your _Inventory & Shipping_ settings is required for the geolocation feature.
+:warning: To use the IP lookup fallback, you must have an API key for https://ip-geolocation.whoisxmlapi.com.
 
 ## Configuration
 
@@ -29,7 +32,7 @@ A block is also provided which renders a form allowing the user to manually chan
 ```json
     "vtex.store-components": "3.x",
     "vtex.modal-layout": "0.x",
-    "vtex.shopper-location": "0.x"
+    "vtex.shopper-location": "1.x"
 ```
 
 - In one of the JSON files in your theme's `store` folder, define the `shopper-location` block and its children, adjusting the props as needed:
@@ -102,9 +105,9 @@ A block is also provided which renders a form allowing the user to manually chan
 
 You have the option to redirect the user to a country specific URL, based on the user's location. In the App Settings, enter the [alpha-3 country code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3#Officially_assigned_code_elements) and URL for each supported country.
 
-On their first visit, if a user is not on their country's website, they will be given the option to be redirected to their country specific website. For users located in a country that does not have an entry in the App Settings, no option is displayed.
+On their first visit, if a user is not on their country's website, a modal will display an option to be redirected to their country specific website. For users located in a country that does not have an entry in the App Settings, no option is displayed.
 
-Additionally, there is an `Automatic Redirect` option, that will redirect the user automatically, without displaying the option.
+Additionally, there is an `Automatic Redirect` option, that will redirect the user automatically, without displaying the modal.
 
 ## Customization
 

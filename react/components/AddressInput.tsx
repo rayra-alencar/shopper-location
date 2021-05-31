@@ -43,7 +43,7 @@ const AddressInput: FunctionComponent<any> = ({
     }
 
     if (name === 'postalCode') {
-      return 'w-100'
+      return 'w-100 pb5'
     }
 
     return 'pb5 w-100'

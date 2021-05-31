@@ -4,7 +4,7 @@ import { helpers } from 'vtex.address-form'
 const { addValidation } = helpers
 
 interface LocationContextProps {
-  location: AddressFormFields
+  location: AddressFormFields,
 }
 
 type ReducerActions = {

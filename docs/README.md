@@ -14,7 +14,7 @@ A block is also provided which renders a form allowing the user to manually chan
 
 Shopper Location also supports redirecting a user to a URL based off their location determined by the app. See the [Client Redirect](#client-redirect) section.
 
-:information_source: The Google Geolocation API key in your _Inventory & Shipping_ settings is required for the geolocation feature.
+:information*source: The Google Geolocation API key in your \_Inventory & Shipping* settings is required for the geolocation feature.
 :warning: To use the IP lookup fallback, you must have an API key for https://ip-geolocation.whoisxmlapi.com.
 
 ## Configuration
@@ -39,7 +39,10 @@ Shopper Location also supports redirecting a user to a URL based off their locat
 
 ```json
 "shopper-location": {
-    "children": ["modal-trigger#address"]
+    "children": ["modal-trigger#address"],
+    "props": {
+      "autofill": ["city", "country", "neighborhood", "number", "postalCode", "state", "street"]
+    }
   },
   "modal-trigger#address": {
     "children": ["user-address", "modal-layout#address"]
@@ -74,6 +77,12 @@ Shopper Location also supports redirecting a user to a URL based off their locat
   "modal-content#address": {
     "children": ["change-location"]
   },
+  "change-location": {
+		"props":{
+      "postalCode": "first",
+			"autocomplete": true
+    }
+	},
 ```
 
 - Also in one of the JSON files, place the `shopper-location` block in your layout. For example, to place the block in the header:
@@ -108,6 +117,21 @@ You have the option to redirect the user to a country specific URL, based on the
 On their first visit, if a user is not on their country's website, a modal will display an option to be redirected to their country specific website. For users located in a country that does not have an entry in the App Settings, no option is displayed.
 
 Additionally, there is an `Automatic Redirect` option, that will redirect the user automatically, without displaying the modal.
+
+#### Props
+
+`shopper-location`:
+
+| Prop name  | Type   | Description                                  | Default value | Accepted values                                                                                                 |
+| ---------- | ------ | -------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `autofill` | `enum` | Define which address fields should be filled | `undefined`   | Array with any of these values `["city", "country", "neighborhood", "number", "postalCode", "state", "street"]` |
+
+`change-location`:
+
+| Prop name      | Type      | Description                                         | Default value | Accepted values |
+| -------------- | --------- | --------------------------------------------------- | ------------- | --------------- |
+| `postalCode`   | `string`  | Define the postalCode position on the form          | `last`        | `first`,`last`  |
+| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode | `false`       | `true`,`false`  |
 
 ## Customization
 

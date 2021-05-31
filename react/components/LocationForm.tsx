@@ -3,6 +3,7 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
+import { useRuntime } from 'vtex.render-runtime'
 import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
 import { CountrySelector, helpers, inputs } from 'vtex.address-form'
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
@@ -36,6 +37,9 @@ interface AddressProps {
   shipsTo: string[]
   googleMapsKey: string
   orderForm: any
+  autofill?: string[]
+  autocomplete?: boolean
+  postalCode?: string
 }
 
 const CSS_HANDLES = [
@@ -85,7 +89,6 @@ const getGeolocation = async (key: string, address: any) => {
           location: { lat, lng },
         },
       } = result
-
       geolocation = [lng, lat]
     }
   } catch (err) {
@@ -95,16 +98,50 @@ const getGeolocation = async (key: string, address: any) => {
   return geolocation
 }
 
-const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
-  intl,
-  rules,
-  currentAddress,
-  shipsTo,
-  orderForm,
-  googleMapsKey,
-}) => {
+const getFulllocation = async (key: string, address: any) => {
+  const query = encodeURIComponent(
+    String(
+      `${address.postalCode?.value || ''}`
+    ).trim()
+  )
+
+  if (!query) return
+  let results: any = []
+  let result: any = {}
+
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`
+    )
+
+    results = await response.json()
+    const {
+      results: [result],
+    } = results
+
+    return result
+  } catch (err) {
+    return result
+  }
+}
+
+const LocationForm: FunctionComponent<WrappedComponentProps &
+  AddressProps> = props => {
+  const {
+    intl,
+    rules,
+    currentAddress,
+    shipsTo,
+    orderForm,
+    googleMapsKey,
+    autofill,
+    autocomplete,
+    postalCode,
+  } = props
+
   const dispatch: any = useModalDispatch()
-  const { location } = useLocationState()
+  let { location } = useLocationState()
+
   const locationDispatch = useLocationDispatch()
   const [countryError, setCountryError] = useState(false)
   const [geoError, setGeoError] = useState(false)
@@ -113,6 +150,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const isMountedRef = useRef(false)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
+  const {culture} = useRuntime()
 
   const [
     updateAddress,
@@ -135,6 +173,10 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       updateAddressLoading ||
       setRegionIdLoading
     )
+  }
+
+  if(location?.country?.value === "") {
+    location.country.value = culture.country
   }
 
   useEffect(() => {
@@ -219,7 +261,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     }
 
     // save geolocation to state
-    const addressFields = getParsedAddress(parsedResponse.results[0])
+    const addressFields = getParsedAddress(parsedResponse.results[0], autofill)
 
     if (!shipsTo.includes(addressFields.country)) {
       setCountryError(true)
@@ -358,24 +400,50 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     clearTimeout(geoTimeout)
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
+    const notRequired = ['complement','receiverName']
     const validatedAddress = validateAddress(combinedAddress, rules)
-
+    const customRules = rules
+          customRules.fields = customRules.fields.map((field: any) => {
+            return {
+              ...field,
+              required: notRequired.indexOf(field.label) !== -1 ? false : true
+            }
+          })
     geoTimeout = setTimeout(() => {
-      getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
-        if (res?.length && isMountedRef.current) {
-          locationDispatch({
-            type: 'SET_LOCATION',
-            args: {
-              address: {
-                ...validatedAddress,
-                geoCoordinates: {
-                  value: res,
+      if (
+        newAddress?.postalCode?.value &&
+        postalCode === 'first' &&
+        autocomplete === true
+      ) {
+        getFulllocation(googleMapsKey, validatedAddress).then((res: any) => {
+          const responseAddress = addValidation(getParsedAddress(res, autofill), customRules)
+          const address = validateAddress(responseAddress, customRules)
+          if (res && isMountedRef.current) {
+            locationDispatch({
+              type: 'SET_LOCATION',
+              args: {
+                address,
+              },
+            })
+          }
+        })
+      } else {
+        getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
+          if (res?.length && isMountedRef.current) {
+            locationDispatch({
+              type: 'SET_LOCATION',
+              args: {
+                address: {
+                  ...validatedAddress,
+                  geoCoordinates: {
+                    value: res,
+                  },
                 },
               },
-            },
-          })
-        }
-      })
+            })
+          }
+        })
+      }
     }, 2500)
 
     if (isMountedRef.current) {
@@ -406,6 +474,13 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   const shipCountries = translateCountries()
+
+  const sortFields = (_a: any, b: any) => {
+    if (props.postalCode && props.postalCode.toLowerCase() === 'first') {
+      return b.name === 'postalCode' ? 1 : -1
+    }
+    return b.name === 'postalCode' ? -1 : 1
+  }
 
   return (
     <div
@@ -462,20 +537,18 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 }
               />
             </div>
-            <div className="flex flex-wrap">
-              {rules.fields
-                .sort((_a: any, b: any) => (b.name === 'postalCode' ? -1 : 1))
-                .map((field: any) => {
-                  return (
-                    <AddressInput
-                      key={field.name}
-                      intl={intl}
-                      field={field}
-                      location={location}
-                      handleAddressChange={handleAddressChange}
-                    />
-                  )
-                })}
+            <div className="flex flex-wrap fields-container">
+              {rules.fields.sort(sortFields).map((field: any) => {
+                return (
+                  <AddressInput
+                    key={field.name}
+                    intl={intl}
+                    field={field}
+                    location={location}
+                    handleAddressChange={handleAddressChange}
+                  />
+                )
+              })}
             </div>
           </section>
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>

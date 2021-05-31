@@ -11,12 +11,9 @@ const getCountryISO3 = require('country-iso-2-to-3')
  * @param {Object} place The place object returned from Google Maps API
  * @returns {Object} The reduced address data with only necessary fields/information
  */
-export const getParsedAddress = (place: {
-  address_components: any[]
-  geometry: any
-}) => {
+export const getParsedAddress = (place: any, autofill: any = null) => {
   const parsedAddressComponents = place.address_components.reduce(
-    (accumulator, address) => {
+    (accumulator: any, address:any) => {
       const parsedItem = address.types.reduce(
         (typeAccumulator: any, type: any) => ({
           ...typeAccumulator,
@@ -43,7 +40,7 @@ export const getParsedAddress = (place: {
       }${parsedAddressComponents.route}`
     : ''
 
-  const address = {
+  const fullAddress: any = {
     addressType: 'residential',
     city:
       parsedAddressComponents.locality ||
@@ -61,5 +58,22 @@ export const getParsedAddress = (place: {
     geoCoordinates: latitude && longitude ? [longitude, latitude] : null,
   }
 
-  return address
+  const basicAddress: any = {
+    addressType: fullAddress.addressType,
+    country: fullAddress.country, 
+    postalCode: fullAddress.postalCode,
+    geoCoordinates: fullAddress.geoCoordinates,
+    receiverName: fullAddress.receiverName,
+  }
+  const validKeys = ["city", "country", "neighborhood", "number", "postalCode", "state", "street"]
+  
+  if (autofill) {
+    autofill.forEach((field: string) => {
+      if (validKeys.indexOf(field) !== -1 && fullAddress[field]) {
+        basicAddress[field] = fullAddress[field]
+      }
+    })
+  }
+
+  return autofill ? basicAddress : fullAddress
 }

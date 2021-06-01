@@ -1,7 +1,7 @@
 {
   "name": "shopper-location",
   "vendor": "vtex",
-  "version": "1.3.0-beta.1",
+  "version": "1.3.0-beta.2",
   "title": "Shopper Location",
   "description": "Determine location of shopper and store it in the orderForm",
   "builders": {

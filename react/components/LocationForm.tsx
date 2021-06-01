@@ -100,9 +100,7 @@ const getGeolocation = async (key: string, address: any) => {
 
 const getFulllocation = async (key: string, address: any) => {
   const query = encodeURIComponent(
-    String(
-      `${address.postalCode?.value || ''}`
-    ).trim()
+    String(`${address.postalCode?.value || ''}`).trim()
   )
 
   if (!query) return
@@ -150,7 +148,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
   const isMountedRef = useRef(false)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
-  const {culture} = useRuntime()
+  const { culture } = useRuntime()
 
   const [
     updateAddress,
@@ -175,7 +173,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     )
   }
 
-  if(location?.country?.value === "") {
+  if (location?.country?.value === '') {
     location.country.value = culture.country
   }
 
@@ -197,12 +195,19 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
       isMountedRef.current = false
     }
   }, [])
-
+  const notRequired = ['complement', 'receiverName', 'reference']
+  let customRules = rules
+  customRules.fields = customRules.fields.map((field: any) => {
+    return {
+      ...field,
+      required: notRequired.indexOf(field.name) !== -1 ? false : true,
+    }
+  })
   useEffect(() => {
-    if (location.country.value && rules.country) {
+    if (location.country.value && customRules.country) {
       resetAddressRules()
     }
-  }, [rules])
+  }, [customRules])
 
   useEffect(() => {
     if (mutationsPending()) {
@@ -244,14 +249,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
       return { results: [] }
     }
   }
-  const notRequired = ['complement','receiverName','reference']
-  const customRules = rules
-        customRules.fields = customRules.fields.map((field: any) => {
-          return {
-            ...field,
-            required: notRequired.indexOf(field.label) !== -1 ? false : true
-          }
-        })
 
   const handleSuccess = async (position: Position) => {
     // call Google Maps API to get location details from returned coordinates
@@ -297,8 +294,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
 
     const fieldsWithValidation = addValidation(geolocatedAddress)
     const validatedFields = validateAddress(fieldsWithValidation, customRules)
-
-    console.log('validatedFields =>', validatedFields)
 
     locationDispatch({
       type: 'SET_LOCATION',
@@ -366,7 +361,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
   }
 
   function resetAddressRules() {
-    const hiddenFields = rules.fields
+    const hiddenFields = customRules.fields
       .filter(
         (f: any) =>
           f.hidden === true &&
@@ -384,7 +379,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
         return obj
       }, {})
 
-    const address = addValidation(addressFields, rules)
+    const address = addValidation(addressFields, customRules)
 
     locationDispatch({
       type: 'SET_LOCATION',
@@ -411,7 +406,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
     const validatedAddress = validateAddress(combinedAddress, customRules)
-    
+
     geoTimeout = setTimeout(() => {
       if (
         newAddress?.postalCode?.value &&
@@ -419,8 +414,12 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
         autocomplete === true
       ) {
         getFulllocation(googleMapsKey, validatedAddress).then((res: any) => {
-          const responseAddress = addValidation(getParsedAddress(res, autofill), customRules)
+          const responseAddress = addValidation(
+            getParsedAddress(res, autofill),
+            customRules
+          )
           const address = validateAddress(responseAddress, customRules)
+
           if (res && isMountedRef.current) {
             locationDispatch({
               type: 'SET_LOCATION',
@@ -432,7 +431,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
         })
       } else {
         getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
-          console.log('Validated address =>', validateAddress)
           if (res?.length && isMountedRef.current) {
             locationDispatch({
               type: 'SET_LOCATION',
@@ -480,11 +478,13 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
   const shipCountries = translateCountries()
 
   const sortFields = (_a: any, b: any) => {
-    if (props.postalCode && props.postalCode.toLowerCase() === 'first') {
-      return b.name === 'postalCode' ? 1 : -1
+    if (!props.postalCode || props?.postalCode?.toLowerCase() !== 'first') {
+      return b.name === 'postalCode' ? -1 : 1
     }
-    return b.name === 'postalCode' ? -1 : 1
+    return 0
   }
+
+  const fields = customRules.fields.sort(sortFields)
 
   return (
     <div
@@ -542,7 +542,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
               />
             </div>
             <div className="flex flex-wrap fields-container">
-              {rules.fields.sort(sortFields).map((field: any) => {
+              {fields.map((field: any) => {
                 return (
                   <AddressInput
                     key={field.name}
@@ -558,7 +558,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button
               variation="primary"
-              disabled={!location || !isValidAddress(location, rules).valid}
+              disabled={
+                !location || !isValidAddress(location, customRules).valid
+              }
               onClick={() => handleUpdateAddress()}
               class={handles.changeLocationSubmitButton}
               isLoading={locationLoading}

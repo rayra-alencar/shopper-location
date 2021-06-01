@@ -244,6 +244,14 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
       return { results: [] }
     }
   }
+  const notRequired = ['complement','receiverName','reference']
+  const customRules = rules
+        customRules.fields = customRules.fields.map((field: any) => {
+          return {
+            ...field,
+            required: notRequired.indexOf(field.label) !== -1 ? false : true
+          }
+        })
 
   const handleSuccess = async (position: Position) => {
     // call Google Maps API to get location details from returned coordinates
@@ -288,7 +296,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     }
 
     const fieldsWithValidation = addValidation(geolocatedAddress)
-    const validatedFields = validateAddress(fieldsWithValidation, rules)
+    const validatedFields = validateAddress(fieldsWithValidation, customRules)
+
+    console.log('validatedFields =>', validatedFields)
 
     locationDispatch({
       type: 'SET_LOCATION',
@@ -400,15 +410,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     clearTimeout(geoTimeout)
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
-    const notRequired = ['complement','receiverName']
-    const validatedAddress = validateAddress(combinedAddress, rules)
-    const customRules = rules
-          customRules.fields = customRules.fields.map((field: any) => {
-            return {
-              ...field,
-              required: notRequired.indexOf(field.label) !== -1 ? false : true
-            }
-          })
+    const validatedAddress = validateAddress(combinedAddress, customRules)
+    
     geoTimeout = setTimeout(() => {
       if (
         newAddress?.postalCode?.value &&
@@ -429,6 +432,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
         })
       } else {
         getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
+          console.log('Validated address =>', validateAddress)
           if (res?.length && isMountedRef.current) {
             locationDispatch({
               type: 'SET_LOCATION',

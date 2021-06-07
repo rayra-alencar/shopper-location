@@ -80,7 +80,9 @@ Shopper Location also supports redirecting a user to a URL based off their locat
   "change-location": {
 		"props":{
       "postalCode": "first",
-			"autocomplete": true
+			"autocomplete": true,
+      "notRequired": ["street", "number", "city", "state"],
+      "hideFields": ["complement", "neighborhood", "receiverName", "reference"]
     }
 	},
 ```
@@ -122,16 +124,18 @@ Additionally, there is an `Automatic Redirect` option, that will redirect the us
 
 `shopper-location`:
 
-| Prop name  | Type   | Description                                  | Default value | Accepted values                                                                                                 |
-| ---------- | ------ | -------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
-| `autofill` | `enum` | Define which address fields should be filled | `undefined`   | Array with any of these values `["city", "country", "neighborhood", "number", "postalCode", "state", "street"]` |
+| Prop name  | Type    | Description                                  | Default value | Accepted values                                                                                                 |
+| ---------- | ------- | -------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `autofill` | `array` | Define which address fields should be filled | `undefined`   | Array with any of these values `["city", "country", "neighborhood", "number", "postalCode", "state", "street"]` |
 
 `change-location`:
 
-| Prop name      | Type      | Description                                         | Default value | Accepted values |
-| -------------- | --------- | --------------------------------------------------- | ------------- | --------------- |
-| `postalCode`   | `string`  | Define the postalCode position on the form          | `last`        | `first`,`last`  |
-| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode | `false`       | `true`,`false`  |
+| Prop name      | Type      | Description                                         | Default value | Accepted values                                                                                              |
+| -------------- | --------- | --------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `postalCode`   | `string`  | Define the postalCode position on the form          | `last`        | `first`,`last`                                                                                               |
+| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode | `false`       | `true`,`false`                                                                                               |
+| `notRequired`  | `array`   | Turn visible fields not required                    | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
+| `hideFields`   | `array`   | Hide fields and turn them not required              | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
 
 ## Customization
 
@@ -143,6 +147,7 @@ In order to apply CSS customizations in this and other blocks, follow the instru
 | `changeLocationContainer`         |
 | `changeLocationFormContainer`     |
 | `changeLocationGeoContainer`      |
+| `changeLocationMapContainer`      |
 | `changeLocationGeoErrorContainer` |
 | `changeLocationGeolocationButton` |
 | `changeLocationSubmitContainer`   |

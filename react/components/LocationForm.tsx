@@ -40,6 +40,8 @@ interface AddressProps {
   autofill?: string[]
   autocomplete?: boolean
   postalCode?: string
+  hideFields?: string[]
+  notRequired?: string[]
 }
 
 const CSS_HANDLES = [
@@ -48,6 +50,7 @@ const CSS_HANDLES = [
   'changeLocationTitle',
   'changeLocationAddressContainer',
   'changeLocationGeoContainer',
+  'changeLocationMapContainer',
   'changeLocationGeoErrorContainer',
   'changeLocationSubmitContainer',
   'changeLocationSubmitButton',
@@ -135,6 +138,8 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     autofill,
     autocomplete,
     postalCode,
+    hideFields,
+    notRequired,
   } = props
 
   const dispatch: any = useModalDispatch()
@@ -195,19 +200,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
       isMountedRef.current = false
     }
   }, [])
-  const notRequired = ['complement', 'receiverName', 'reference']
+  const fieldsNotRequired = ['complement', 'receiverName', 'reference']
+  if(notRequired && notRequired.length) {
+    notRequired.forEach((field: string) => {
+      fieldsNotRequired.push(field)
+    });  
+  }
   let customRules = rules
-  customRules.fields = customRules.fields.map((field: any) => {
+  customRules.fields = customRules.fields
+  .map((field: any) => {
     return {
       ...field,
-      required: notRequired.indexOf(field.name) !== -1 ? false : true,
+      hidden: hideFields && hideFields.indexOf(field.name) !== -1 ? true : field.hidden && field.hidden === true,
     }
   })
-  useEffect(() => {
-    if (location.country.value && customRules.country) {
-      resetAddressRules()
+  .map((field: any) => {
+    return {
+      ...field,
+      required: fieldsNotRequired.indexOf(field.name) !== -1 ? false : (field.hidden === true ? false : true),
     }
-  }, [customRules])
+  })
 
   useEffect(() => {
     if (mutationsPending()) {
@@ -294,7 +306,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
 
     const fieldsWithValidation = addValidation(geolocatedAddress)
     const validatedFields = validateAddress(fieldsWithValidation, customRules)
-
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -380,7 +391,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
       }, {})
 
     const address = addValidation(addressFields, customRules)
-
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -392,7 +402,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
   function handleCountryChange(newAddress: any) {
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
-
+    resetAddressRules()
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -509,7 +519,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
-              <ButtonWithIcon
+              <><ButtonWithIcon
                 variation="primary"
                 icon={<IconLocation />}
                 onClick={() => handleGeolocation()}
@@ -517,7 +527,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
                 isLoading={geoLoading}
               >
                 <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-              </ButtonWithIcon>
+              </ButtonWithIcon></>
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
@@ -570,7 +580,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
           </section>
         </div>
         {!isMobile && (
-          <div className="flex-grow-1 relative w-100">
+          <div className={`flex-grow-1 relative w-100 ${handles.changeLocationMapContainer}`}>
             <MapContainer
               geoCoordinates={location.geoCoordinates.value}
               googleMapsApiKey={googleMapsKey}

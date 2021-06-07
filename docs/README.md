@@ -133,7 +133,7 @@ Additionally, there is an `Automatic Redirect` option, that will redirect the us
 | Prop name      | Type      | Description                                         | Default value | Accepted values                                                                                              |
 | -------------- | --------- | --------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
 | `postalCode`   | `string`  | Define the postalCode position on the form          | `last`        | `first`,`last`                                                                                               |
-| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode | `false`       | `true`,`false`                                                                                               |
+| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode (Only works when **postalCode** is set to `first`) | `false`       | `true`,`false`                                                                                               |
 | `notRequired`  | `array`   | Turn visible fields not required                    | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
 | `hideFields`   | `array`   | Hide fields and turn them not required              | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
 

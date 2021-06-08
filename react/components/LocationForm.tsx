@@ -3,6 +3,7 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { WrappedComponentProps, FormattedMessage } from 'react-intl'
+import { useRuntime } from 'vtex.render-runtime'
 import { useModalDispatch } from 'vtex.modal-layout/ModalContext'
 import { CountrySelector, helpers, inputs } from 'vtex.address-form'
 import { Button, ButtonWithIcon, IconLocation } from 'vtex.styleguide'
@@ -36,6 +37,11 @@ interface AddressProps {
   shipsTo: string[]
   googleMapsKey: string
   orderForm: any
+  autofill?: string[]
+  autocomplete?: boolean
+  postalCode?: string
+  hideFields?: string[]
+  notRequired?: string[]
 }
 
 const CSS_HANDLES = [
@@ -44,6 +50,7 @@ const CSS_HANDLES = [
   'changeLocationTitle',
   'changeLocationAddressContainer',
   'changeLocationGeoContainer',
+  'changeLocationMapContainer',
   'changeLocationGeoErrorContainer',
   'changeLocationSubmitContainer',
   'changeLocationSubmitButton',
@@ -85,7 +92,6 @@ const getGeolocation = async (key: string, address: any) => {
           location: { lat, lng },
         },
       } = result
-
       geolocation = [lng, lat]
     }
   } catch (err) {
@@ -95,16 +101,50 @@ const getGeolocation = async (key: string, address: any) => {
   return geolocation
 }
 
-const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
-  intl,
-  rules,
-  currentAddress,
-  shipsTo,
-  orderForm,
-  googleMapsKey,
-}) => {
+const getFulllocation = async (key: string, address: any) => {
+  const query = encodeURIComponent(
+    String(`${address.postalCode?.value || ''}`).trim()
+  )
+
+  if (!query) return
+  let results: any = []
+  let result: any = {}
+
+  try {
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${query}&key=${key}`
+    )
+
+    results = await response.json()
+    const {
+      results: [result],
+    } = results
+
+    return result
+  } catch (err) {
+    return result
+  }
+}
+
+const LocationForm: FunctionComponent<WrappedComponentProps &
+  AddressProps> = props => {
+  const {
+    intl,
+    rules,
+    currentAddress,
+    shipsTo,
+    orderForm,
+    googleMapsKey,
+    autofill,
+    autocomplete,
+    postalCode,
+    hideFields,
+    notRequired,
+  } = props
+
   const dispatch: any = useModalDispatch()
-  const { location } = useLocationState()
+  let { location } = useLocationState()
+
   const locationDispatch = useLocationDispatch()
   const [countryError, setCountryError] = useState(false)
   const [geoError, setGeoError] = useState(false)
@@ -113,6 +153,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   const isMountedRef = useRef(false)
   const handles = useCssHandles(CSS_HANDLES)
   const { isMobile } = useDevice()
+  const { culture } = useRuntime()
 
   const [
     updateAddress,
@@ -137,6 +178,10 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     )
   }
 
+  if (location?.country?.value === '') {
+    location.country.value = culture.country
+  }
+
   useEffect(() => {
     isMountedRef.current = true
     currentAddress.receiverName = currentAddress.receiverName || { value: ' ' }
@@ -155,12 +200,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
       isMountedRef.current = false
     }
   }, [])
-
-  useEffect(() => {
-    if (location.country.value && rules.country) {
-      resetAddressRules()
+  const fieldsNotRequired = ['complement', 'receiverName', 'reference']
+  if(notRequired && notRequired.length) {
+    notRequired.forEach((field: string) => {
+      fieldsNotRequired.push(field)
+    });  
+  }
+  let customRules = rules
+  customRules.fields = customRules.fields
+  .map((field: any) => {
+    return {
+      ...field,
+      hidden: hideFields && hideFields.indexOf(field.name) !== -1 ? true : field.hidden && field.hidden === true,
     }
-  }, [rules])
+  })
+  .map((field: any) => {
+    return {
+      ...field,
+      required: fieldsNotRequired.indexOf(field.name) !== -1 ? false : (field.hidden === true ? false : true),
+    }
+  })
 
   useEffect(() => {
     if (mutationsPending()) {
@@ -219,7 +278,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     }
 
     // save geolocation to state
-    const addressFields = getParsedAddress(parsedResponse.results[0])
+    const addressFields = getParsedAddress(parsedResponse.results[0], autofill)
 
     if (!shipsTo.includes(addressFields.country)) {
       setCountryError(true)
@@ -246,8 +305,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     }
 
     const fieldsWithValidation = addValidation(geolocatedAddress)
-    const validatedFields = validateAddress(fieldsWithValidation, rules)
-
+    const validatedFields = validateAddress(fieldsWithValidation, customRules)
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -314,7 +372,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   }
 
   function resetAddressRules() {
-    const hiddenFields = rules.fields
+    const hiddenFields = customRules.fields
       .filter(
         (f: any) =>
           f.hidden === true &&
@@ -332,8 +390,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
         return obj
       }, {})
 
-    const address = addValidation(addressFields, rules)
-
+    const address = addValidation(addressFields, customRules)
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -345,7 +402,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
   function handleCountryChange(newAddress: any) {
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
-
+    resetAddressRules()
     locationDispatch({
       type: 'SET_LOCATION',
       args: {
@@ -358,24 +415,47 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
     clearTimeout(geoTimeout)
     const curAddress = location
     const combinedAddress = { ...curAddress, ...newAddress }
-    const validatedAddress = validateAddress(combinedAddress, rules)
+    const validatedAddress = validateAddress(combinedAddress, customRules)
 
     geoTimeout = setTimeout(() => {
-      getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
-        if (res?.length && isMountedRef.current) {
-          locationDispatch({
-            type: 'SET_LOCATION',
-            args: {
-              address: {
-                ...validatedAddress,
-                geoCoordinates: {
-                  value: res,
+      if (
+        newAddress?.postalCode?.value &&
+        postalCode === 'first' &&
+        autocomplete === true
+      ) {
+        getFulllocation(googleMapsKey, validatedAddress).then((res: any) => {
+          const responseAddress = addValidation(
+            getParsedAddress(res, autofill),
+            customRules
+          )
+          const address = validateAddress(responseAddress, customRules)
+
+          if (res && isMountedRef.current) {
+            locationDispatch({
+              type: 'SET_LOCATION',
+              args: {
+                address,
+              },
+            })
+          }
+        })
+      } else {
+        getGeolocation(googleMapsKey, validatedAddress).then((res: any) => {
+          if (res?.length && isMountedRef.current) {
+            locationDispatch({
+              type: 'SET_LOCATION',
+              args: {
+                address: {
+                  ...validatedAddress,
+                  geoCoordinates: {
+                    value: res,
+                  },
                 },
               },
-            },
-          })
-        }
-      })
+            })
+          }
+        })
+      }
     }, 2500)
 
     if (isMountedRef.current) {
@@ -407,6 +487,15 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
 
   const shipCountries = translateCountries()
 
+  const sortFields = (_a: any, b: any) => {
+    if (!props.postalCode || props?.postalCode?.toLowerCase() !== 'first') {
+      return b.name === 'postalCode' ? -1 : 1
+    }
+    return 0
+  }
+
+  const fields = customRules.fields.sort(sortFields)
+
   return (
     <div
       className={`${handles.changeLocationContainer} w-100`}
@@ -430,7 +519,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
-              <ButtonWithIcon
+              <><ButtonWithIcon
                 variation="primary"
                 icon={<IconLocation />}
                 onClick={() => handleGeolocation()}
@@ -438,7 +527,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 isLoading={geoLoading}
               >
                 <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-              </ButtonWithIcon>
+              </ButtonWithIcon></>
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
@@ -462,26 +551,26 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
                 }
               />
             </div>
-            <div className="flex flex-wrap">
-              {rules.fields
-                .sort((_a: any, b: any) => (b.name === 'postalCode' ? -1 : 1))
-                .map((field: any) => {
-                  return (
-                    <AddressInput
-                      key={field.name}
-                      intl={intl}
-                      field={field}
-                      location={location}
-                      handleAddressChange={handleAddressChange}
-                    />
-                  )
-                })}
+            <div className="flex flex-wrap fields-container">
+              {fields.map((field: any) => {
+                return (
+                  <AddressInput
+                    key={field.name}
+                    intl={intl}
+                    field={field}
+                    location={location}
+                    handleAddressChange={handleAddressChange}
+                  />
+                )
+              })}
             </div>
           </section>
           <section className={`${handles.changeLocationSubmitContainer} mt7`}>
             <Button
               variation="primary"
-              disabled={!location || !isValidAddress(location, rules).valid}
+              disabled={
+                !location || !isValidAddress(location, customRules).valid
+              }
               onClick={() => handleUpdateAddress()}
               class={handles.changeLocationSubmitButton}
               isLoading={locationLoading}
@@ -491,7 +580,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps & AddressProps> = ({
           </section>
         </div>
         {!isMobile && (
-          <div className="flex-grow-1 relative w-100">
+          <div className={`flex-grow-1 relative w-100 ${handles.changeLocationMapContainer}`}>
             <MapContainer
               geoCoordinates={location.geoCoordinates.value}
               googleMapsApiKey={googleMapsKey}

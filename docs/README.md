@@ -14,7 +14,7 @@ A block is also provided which renders a form allowing the user to manually chan
 
 Shopper Location also supports redirecting a user to a URL based off their location determined by the app. See the [Client Redirect](#client-redirect) section.
 
-:information_source: The Google Geolocation API key in your _Inventory & Shipping_ settings is required for the geolocation feature.
+:information*source: The Google Geolocation API key in your \_Inventory & Shipping* settings is required for the geolocation feature.
 :warning: To use the IP lookup fallback, you must have an API key for https://ip-geolocation.whoisxmlapi.com.
 
 ## Configuration
@@ -39,7 +39,10 @@ Shopper Location also supports redirecting a user to a URL based off their locat
 
 ```json
 "shopper-location": {
-    "children": ["modal-trigger#address"]
+    "children": ["modal-trigger#address"],
+    "props": {
+      "autofill": ["city", "country", "neighborhood", "number", "postalCode", "state", "street"]
+    }
   },
   "modal-trigger#address": {
     "children": ["user-address", "modal-layout#address"]
@@ -74,6 +77,14 @@ Shopper Location also supports redirecting a user to a URL based off their locat
   "modal-content#address": {
     "children": ["change-location"]
   },
+  "change-location": {
+		"props":{
+      "postalCode": "first",
+			"autocomplete": true,
+      "notRequired": ["street", "number", "city", "state"],
+      "hideFields": ["complement", "neighborhood", "receiverName", "reference"]
+    }
+	},
 ```
 
 - Also in one of the JSON files, place the `shopper-location` block in your layout. For example, to place the block in the header:
@@ -109,6 +120,23 @@ On their first visit, if a user is not on their country's website, a modal will 
 
 Additionally, there is an `Automatic Redirect` option, that will redirect the user automatically, without displaying the modal.
 
+#### Props
+
+`shopper-location`:
+
+| Prop name  | Type    | Description                                  | Default value | Accepted values                                                                                                 |
+| ---------- | ------- | -------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
+| `autofill` | `array` | Define which address fields should be filled | `undefined`   | Array with any of these values `["city", "country", "neighborhood", "number", "postalCode", "state", "street"]` |
+
+`change-location`:
+
+| Prop name      | Type      | Description                                         | Default value | Accepted values                                                                                              |
+| -------------- | --------- | --------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `postalCode`   | `string`  | Define the postalCode position on the form          | `last`        | `first`,`last`                                                                                               |
+| `autocomplete` | `boolean` | Enables google autocomplete based on the postalCode (Only works when **postalCode** is set to `first`) | `false`       | `true`,`false`                                                                                               |
+| `notRequired`  | `array`   | Turn visible fields not required                    | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
+| `hideFields`   | `array`   | Hide fields and turn them not required              | `undefined`   | `["city", "country", "neighborhood", "number", "state", "street", "complement","receiverName", "reference"]` |
+
 ## Customization
 
 In order to apply CSS customizations in this and other blocks, follow the instructions given in the recipe on [Using CSS Handles for store customization](https://vtex.io/docs/recipes/style/using-css-handles-for-store-customization).
@@ -119,6 +147,7 @@ In order to apply CSS customizations in this and other blocks, follow the instru
 | `changeLocationContainer`         |
 | `changeLocationFormContainer`     |
 | `changeLocationGeoContainer`      |
+| `changeLocationMapContainer`      |
 | `changeLocationGeoErrorContainer` |
 | `changeLocationGeolocationButton` |
 | `changeLocationSubmitContainer`   |

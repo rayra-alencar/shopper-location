@@ -1,9 +1,5 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  FunctionComponent,
-} from 'react'
+import PropTypes from 'prop-types'
+import React, { useEffect, useState, useCallback } from 'react'
 import { useQuery, useMutation } from 'react-apollo'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { ToastProvider } from 'vtex.styleguide'
@@ -20,10 +16,11 @@ const geolocationOptions = {
   maximumAge: 30000,
   timeout: 10000,
 }
-
-const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
-  children,
-}) => {
+let propAutofill: any = null
+const AddressChallenge: StorefrontFunctionComponent<WrappedComponentProps &
+  any> = (props: any) => {
+  const { autofill, children } = props
+  propAutofill = autofill
   const [updateAddress] = useMutation(UpdateOrderFormShipping)
   const { loading, data, refetch } = useQuery(Address, { ssr: false })
   const { data: logisticsData } = useQuery(Logistics, { ssr: false })
@@ -69,7 +66,10 @@ const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
       if (!parsedResponse.results.length) return
 
       // save geolocation to orderForm
-      const addressFields = getParsedAddress(parsedResponse.results[0])
+      const addressFields = getParsedAddress(
+        parsedResponse.results[0],
+        propAutofill
+      )
 
       addressFields.number = ''
       addressFields.street = ''
@@ -115,7 +115,10 @@ const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
         if (!parsedResponse.results.length) return
 
         // const { shipsTo = [] } = logisticsData?.logistics
-        const addressFields = getParsedAddress(parsedResponse.results[0])
+        const addressFields = getParsedAddress(
+          parsedResponse.results[0],
+          propAutofill
+        )
 
         addressFields.number = ''
         addressFields.street = ''
@@ -178,4 +181,18 @@ const AddressChallenge: FunctionComponent<WrappedComponentProps> = ({
   )
 }
 
+AddressChallenge.propTypes = {
+  props: PropTypes.shape({
+    children: PropTypes.any,
+    autofill: PropTypes.oneOf([
+      'city',
+      'country',
+      'neighborhood',
+      'number',
+      'postalCode',
+      'state',
+      'street',
+    ]),
+  }),
+}
 export default injectIntl(AddressChallenge)

@@ -6,10 +6,10 @@ import {
   initialLocationState,
 } from './components/LocationContext'
 
-const ChangeLocation: FunctionComponent = () => {
+const ChangeLocation: FunctionComponent = (props: any) => {
   return (
     <LocationContextProvider {...initialLocationState}>
-      <ChangeLocationContainer />
+      <ChangeLocationContainer {...props}/>
     </LocationContextProvider>
   )
 }

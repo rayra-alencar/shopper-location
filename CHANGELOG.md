@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Selected address not showing up on the form
+### Added
+- Custom autofill, define which address fields will be filled with the property `autofill` on the `shopper-location` interface
+- Autocomplete address based on the postalCode using Google's API, can be set for the `change-location` interface
+- Adjust postalCode position at the form , can be set for the `change-location` interface
+- `notRequired` and `hideFields` can be set on the `change-location` interface
 ## [1.2.0] - 2021-04-23
 
 ### Added

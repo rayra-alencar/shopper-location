@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React from 'react'
 import { useQuery } from 'react-apollo'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { AddressRules } from 'vtex.address-form'
@@ -12,7 +12,8 @@ import { useLocationState } from './LocationContext'
 
 const CSS_HANDLES = ['changeLocationContainer'] as const
 
-const ChangeLocation: FunctionComponent<WrappedComponentProps> = ({ intl }) => {
+const ChangeLocation: StorefrontFunctionComponent<WrappedComponentProps & any> = (props) => {
+  const {intl, postalCode, autocomplete, autofill, notRequired, hideFields} = props
   const { loading, data } = useQuery(address, { ssr: false })
   const { data: logisticsData } = useQuery(Logistics, { ssr: false })
   const { location } = useLocationState()
@@ -63,6 +64,11 @@ const ChangeLocation: FunctionComponent<WrappedComponentProps> = ({ intl }) => {
         shipsTo={logisticsData.logistics?.shipsTo || []}
         googleMapsKey={logisticsData.logistics?.googleMapsKey || ''}
         intl={intl}
+        postalCode={postalCode}
+        autocomplete={autocomplete}
+        hideFields={hideFields}
+        notRequired={notRequired}
+        autofill={autofill}
       />
     </AddressRules>
   )

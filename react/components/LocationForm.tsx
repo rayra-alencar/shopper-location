@@ -354,7 +354,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     updateAddress({
       variables: {
         orderFormId: orderForm.orderFormId,
-        address: {
+        input: {
           addressType: 'residential',
           street: newAddress.street,
           city: newAddress.city,
@@ -366,6 +366,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
           neighborhood: newAddress.neighborhood,
           complement: newAddress.complement,
           number: newAddress.number,
+          isDisposable: true,
         },
       },
     })

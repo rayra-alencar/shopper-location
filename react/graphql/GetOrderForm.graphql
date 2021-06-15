@@ -1,5 +1,5 @@
-query address @context(provider: "vtex.store-graphql") {
-  orderForm {
+query address {
+  orderForm @context(provider: "vtex.store-graphql") {
     pickupPointCheckedIn {
       friendlyName
     }

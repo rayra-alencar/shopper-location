@@ -1,8 +1,7 @@
 mutation updateOrderFormShipping(
-  $orderFormId: ID
   $address: AddressInput!
-) @context(provider: "vtex.checkout-graphql") {
-  updateOrderFormShipping(orderFormId: $orderFormId, input: $address) {
+) {
+  estimateShipping(address: $address) @context(provider: "vtex.checkout-graphql"){
     id
   }
 }

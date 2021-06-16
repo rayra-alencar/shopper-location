@@ -55,7 +55,7 @@ const AddressChallenge: StorefrontFunctionComponent<WrappedComponentProps &
   )
 
   const handleSuccess = useCallback(
-    async (position: Position) => {
+    async (position: any) => {
       // call Google Maps API to get location details from returned coordinates
       const { latitude, longitude } = position.coords
       const parsedResponse = await requestGoogleMapsApi({
@@ -73,12 +73,10 @@ const AddressChallenge: StorefrontFunctionComponent<WrappedComponentProps &
 
       addressFields.number = ''
       addressFields.street = ''
-
-      const { orderFormId } = data.orderForm
+      addressFields.isDisposable = true
 
       await updateAddress({
         variables: {
-          orderFormId,
           address: addressFields,
         },
       })
@@ -126,11 +124,10 @@ const AddressChallenge: StorefrontFunctionComponent<WrappedComponentProps &
         //   addressFields = fallbackAddress
         //   addressFields.country = shipsTo[0]
         // }
-        const { orderFormId } = data.orderForm
+        addressFields.isDisposable = true
 
         await updateAddress({
           variables: {
-            orderFormId,
             address: addressFields,
           },
         })

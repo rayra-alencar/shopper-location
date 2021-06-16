@@ -13,6 +13,7 @@
     "graphql": "1.x"
   },
   "dependencies": {
+    "vtex.checkout-graphql": "0.x",
     "vtex.store-graphql": "2.x",
     "vtex.apps-graphql": "2.x",
     "vtex.device-detector": "0.x",

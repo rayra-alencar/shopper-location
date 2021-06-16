@@ -201,25 +201,33 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     }
   }, [])
   const fieldsNotRequired = ['complement', 'receiverName', 'reference']
-  if(notRequired && notRequired.length) {
+  if (notRequired && notRequired.length) {
     notRequired.forEach((field: string) => {
       fieldsNotRequired.push(field)
-    });  
+    })
   }
   let customRules = rules
   customRules.fields = customRules.fields
-  .map((field: any) => {
-    return {
-      ...field,
-      hidden: hideFields && hideFields.indexOf(field.name) !== -1 ? true : field.hidden && field.hidden === true,
-    }
-  })
-  .map((field: any) => {
-    return {
-      ...field,
-      required: fieldsNotRequired.indexOf(field.name) !== -1 ? false : (field.hidden === true ? false : true),
-    }
-  })
+    .map((field: any) => {
+      return {
+        ...field,
+        hidden:
+          hideFields && hideFields.indexOf(field.name) !== -1
+            ? true
+            : field.hidden && field.hidden === true,
+      }
+    })
+    .map((field: any) => {
+      return {
+        ...field,
+        required:
+          fieldsNotRequired.indexOf(field.name) !== -1
+            ? false
+            : field.hidden === true
+            ? false
+            : true,
+      }
+    })
 
   useEffect(() => {
     if (mutationsPending()) {
@@ -353,7 +361,6 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
     updateRegionID()
     updateAddress({
       variables: {
-        orderFormId: orderForm.orderFormId,
         address: {
           addressType: 'residential',
           street: newAddress.street,
@@ -366,6 +373,7 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
           neighborhood: newAddress.neighborhood,
           complement: newAddress.complement,
           number: newAddress.number,
+          isDisposable: true,
         },
       },
     })
@@ -519,15 +527,17 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
                 <FormattedMessage id="store/shopper-location.change-location.error-permission" />
               </div>
             ) : (
-              <><ButtonWithIcon
-                variation="primary"
-                icon={<IconLocation />}
-                onClick={() => handleGeolocation()}
-                class={handles.changeLocationGeolocationButton}
-                isLoading={geoLoading}
-              >
-                <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
-              </ButtonWithIcon></>
+              <>
+                <ButtonWithIcon
+                  variation="primary"
+                  icon={<IconLocation />}
+                  onClick={() => handleGeolocation()}
+                  class={handles.changeLocationGeolocationButton}
+                  isLoading={geoLoading}
+                >
+                  <FormattedMessage id="store/shopper-location.change-location.trigger-geolocation" />
+                </ButtonWithIcon>
+              </>
             )}
           </section>
           <section className={`${handles.changeLocationAddressContainer} mt7`}>
@@ -580,7 +590,9 @@ const LocationForm: FunctionComponent<WrappedComponentProps &
           </section>
         </div>
         {!isMobile && (
-          <div className={`flex-grow-1 relative w-100 ${handles.changeLocationMapContainer}`}>
+          <div
+            className={`flex-grow-1 relative w-100 ${handles.changeLocationMapContainer}`}
+          >
             <MapContainer
               geoCoordinates={location.geoCoordinates.value}
               googleMapsApiKey={googleMapsKey}

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.3.1] - 2021-06-16
+
 ### Added
 - `isDisposable` to the address so it don't keep it after the order is placed
 ## [1.3.0] - 2021-06-08
